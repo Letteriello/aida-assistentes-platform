@@ -1,201 +1,276 @@
 # AIDA Platform - AI-Powered WhatsApp Assistant Platform
 
-🤖 **AIDA** (AI-Driven Assistant) é uma plataforma completa para criação e gerenciamento de assistentes de IA integrados ao WhatsApp, com arquitetura multi-tenant, RAG híbrido e processamento avançado de contexto.
+<div align="center">
+  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow" alt="Status">
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white" alt="Supabase">
+  <img src="https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white" alt="WhatsApp">
+</div>
 
-## 🚀 Características Principais
+## 🚀 Visão Geral
 
-### 🏗️ Arquitetura Multi-Tenant
-- **Isolamento completo** entre diferentes negócios
-- **Autenticação baseada em API Key** com escopo por tenant
-- **Recursos dedicados** por inquilino (banco de dados, cache, filas)
+A **AIDA Platform** é uma solução completa e escalável para criação e gerenciamento de assistentes de IA integrados ao WhatsApp. Desenvolvida com arquitetura moderna e foco em performance, a plataforma oferece recursos avançados de RAG (Retrieval-Augmented Generation), multi-tenancy e integração nativa com APIs do WhatsApp.
 
-### 🧠 Sistema RAG Híbrido
-- **Busca Vetorial** com embeddings OpenAI/Anthropic
-- **Busca por Palavras-chave** para consultas específicas
-- **Sistema de Memória** com grafos de conhecimento
-- **Processamento LangChain** para contexto avançado
+### ✨ Características Principais
 
-### 📱 Integração WhatsApp
-- **Evolution API** para comunicação com WhatsApp
-- **Webhooks em tempo real** para mensagens
-- **Formatação automática** de respostas
-- **Suporte a mídia** (imagens, documentos, áudio)
+- **🏢 Arquitetura Multi-Tenant**: Isolamento completo de dados entre organizações
+- **🧠 RAG Híbrido**: Combinação de busca vetorial e keyword search para máxima precisão
+- **📱 Integração WhatsApp**: Suporte nativo às APIs oficiais do WhatsApp Business
+- **⚡ Performance**: Otimizado para alta concorrência e baixa latência
+- **🔒 Segurança**: Criptografia end-to-end e compliance com LGPD/GDPR
+- **📊 Analytics**: Dashboards em tempo real com métricas detalhadas
+- **🔧 Extensível**: Arquitetura modular para fácil customização
 
-### ⚡ Performance e Escalabilidade
-- **Cloudflare Workers** para edge computing
-- **Processamento assíncrono** com filas
-- **Cache distribuído** com KV Store
-- **Analytics em tempo real** com Analytics Engine
+## 🏗️ Arquitetura do Sistema
 
-## 🏛️ Arquitetura do Sistema
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │   WhatsApp      │
-│   (Next.js)     │◄──►│ (Cloudflare     │◄──►│ (Evolution API) │
-│                 │    │  Workers)       │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Supabase      │    │   Cloudflare    │    │   AI Services   │
-│   (Database)    │    │   (KV, R2, AI)  │    │ (OpenAI/Claude) │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        A[Next.js Dashboard]
+        B[React Components]
+        C[Tailwind CSS]
+    end
+    
+    subgraph "API Layer"
+        D[Express.js API]
+        E[Authentication]
+        F[Rate Limiting]
+    end
+    
+    subgraph "Business Logic"
+        G[Assistant Manager]
+        H[RAG Engine]
+        I[WhatsApp Handler]
+    end
+    
+    subgraph "Data Layer"
+        J[Supabase PostgreSQL]
+        K[Vector Store]
+        L[Redis Cache]
+    end
+    
+    subgraph "External Services"
+        M[WhatsApp API]
+        N[OpenAI/Anthropic]
+        O[File Storage]
+    end
+    
+    A --> D
+    D --> G
+    G --> H
+    G --> I
+    H --> K
+    I --> M
+    G --> N
+    D --> J
+    D --> L
 ```
 
 ## 📁 Estrutura do Projeto
 
 ```
 aida-platform/
-├── backend/                 # Cloudflare Workers API
-│   ├── src/
-│   │   ├── ai/             # Processamento de IA
-│   │   ├── api/            # Endpoints da API
-│   │   ├── auth/           # Autenticação multi-tenant
-│   │   ├── evolution-api/  # Integração WhatsApp
-│   │   ├── memory/         # Sistema de memória
-│   │   ├── rag/            # RAG híbrido
-│   │   └── supabase/       # Cliente Supabase
-│   ├── tests/              # Testes automatizados
-│   └── wrangler.toml       # Configuração Cloudflare
-├── frontend/               # Interface Next.js
-│   ├── app/
-│   │   ├── dashboard/      # Dashboard principal
-│   │   ├── assistants/     # Gerenciamento de assistentes
-│   │   └── conversations/  # Visualização de conversas
-│   └── components/         # Componentes reutilizáveis
-├── shared/                 # Tipos e utilitários compartilhados
-│   └── types/              # Definições TypeScript
-├── supabase/               # Configuração do banco
-│   ├── migrations/         # Migrações SQL
-│   └── seed.sql           # Dados iniciais
-└── docs/                   # Documentação
+├── 📁 frontend/                 # Interface web (Next.js)
+│   ├── 📁 app/                 # App Router do Next.js 14
+│   ├── 📁 components/          # Componentes React reutilizáveis
+│   ├── 📁 lib/                 # Utilitários e configurações
+│   └── 📁 public/              # Assets estáticos
+├── 📁 backend/                  # API e lógica de negócio
+│   ├── 📁 src/
+│   │   ├── 📁 controllers/     # Controladores da API
+│   │   ├── 📁 services/        # Lógica de negócio
+│   │   ├── 📁 models/          # Modelos de dados
+│   │   ├── 📁 middleware/      # Middlewares Express
+│   │   └── 📁 utils/           # Utilitários
+│   └── 📁 tests/               # Testes automatizados
+├── 📁 shared/                   # Código compartilhado
+│   ├── 📁 types/               # Definições TypeScript
+│   ├── 📁 schemas/             # Schemas de validação
+│   └── 📁 constants/           # Constantes globais
+├── 📁 docs/                     # Documentação
+└── 📁 .github/                  # Workflows CI/CD
 ```
 
 ## 🛠️ Tecnologias Utilizadas
 
-### Backend
-- **Cloudflare Workers** - Edge computing e APIs
-- **Hono** - Framework web rápido e leve
-- **Supabase** - Banco de dados PostgreSQL
-- **LangChain** - Processamento de IA
-- **Zod** - Validação de schemas
-
 ### Frontend
-- **Next.js 14** - Framework React com App Router
-- **TypeScript** - Tipagem estática
-- **Tailwind CSS** - Estilização utilitária
-- **Shadcn/ui** - Componentes de interface
+- **Next.js 14**: Framework React com App Router
+- **TypeScript**: Tipagem estática
+- **Tailwind CSS**: Framework CSS utilitário
+- **Shadcn/ui**: Componentes UI modernos
+- **React Hook Form**: Gerenciamento de formulários
+- **Zustand**: Gerenciamento de estado
 
-### Infraestrutura
-- **Cloudflare KV** - Cache distribuído
-- **Cloudflare R2** - Armazenamento de objetos
-- **Cloudflare Queues** - Processamento assíncrono
-- **Cloudflare Analytics** - Métricas em tempo real
+### Backend
+- **Node.js**: Runtime JavaScript
+- **Express.js**: Framework web
+- **TypeScript**: Tipagem estática
+- **Supabase**: Backend-as-a-Service
+- **PostgreSQL**: Banco de dados principal
+- **Redis**: Cache e sessões
+- **Prisma**: ORM TypeScript
+
+### IA e ML
+- **OpenAI GPT-4**: Modelo de linguagem principal
+- **Anthropic Claude**: Modelo alternativo
+- **LangChain**: Framework para aplicações LLM
+- **Pinecone/Weaviate**: Vector database
+- **Sentence Transformers**: Embeddings
+
+### DevOps e Infraestrutura
+- **Docker**: Containerização
+- **Vercel**: Deploy do frontend
+- **Railway/Render**: Deploy do backend
+- **GitHub Actions**: CI/CD
+- **Sentry**: Monitoramento de erros
 
 ## 🚀 Início Rápido
 
 ### Pré-requisitos
-- Node.js 20+
+- Node.js 18+
 - npm ou yarn
-- Conta Cloudflare
+- Docker (opcional)
 - Conta Supabase
-- Chaves de API (OpenAI/Anthropic, Evolution API)
+- Chaves API (OpenAI, WhatsApp)
 
-### 1. Clone o Repositório
+### Instalação
+
+1. **Clone o repositório**
 ```bash
 git clone https://github.com/your-org/aida-platform.git
 cd aida-platform
 ```
 
-### 2. Configure o Backend
+2. **Instale as dependências**
 ```bash
-cd backend
-npm install
-
-# Configure as variáveis de ambiente
-cp .env.example .env.local
-
-# Configure os secrets do Cloudflare
-npx wrangler secret put OPENAI_API_KEY
-npx wrangler secret put SUPABASE_URL
-npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-npx wrangler secret put EVOLUTION_API_KEY
-```
-
-### 3. Configure o Frontend
-```bash
-cd ../frontend
-npm install
-
-# Configure as variáveis de ambiente
-cp .env.example .env.local
-```
-
-### 4. Configure o Banco de Dados
-```bash
-cd ../supabase
-
-# Execute as migrações
-supabase db reset
-
-# Ou aplique manualmente
-psql -h your-supabase-host -U postgres -d postgres -f migrations/001_initial_schema.sql
-psql -h your-supabase-host -U postgres -d postgres -f seed.sql
-```
-
-### 5. Execute em Desenvolvimento
-```bash
-# Backend (terminal 1)
-cd backend
-npm run dev
-
-# Frontend (terminal 2)
-cd frontend
-npm run dev
-```
-
-### 6. Deploy para Produção
-```bash
-# Backend
-cd backend
-npm run deploy
-
 # Frontend
 cd frontend
-npm run build
-npx wrangler pages deploy out --project-name aida-platform-frontend
+npm install
+
+# Backend
+cd ../backend
+npm install
+
+# Shared
+cd ../shared
+npm install
 ```
 
-## 📊 Monitoramento e Analytics
+3. **Configure as variáveis de ambiente**
+```bash
+# Frontend (.env.local)
+cp frontend/.env.example frontend/.env.local
 
-### Métricas Disponíveis
-- **Performance de IA**: Tempo de resposta, tokens utilizados
-- **Uso do Sistema**: Mensagens processadas, assistentes ativos
-- **Qualidade RAG**: Relevância de busca, hits de cache
-- **Saúde da API**: Uptime, latência, erros
+# Backend (.env)
+cp backend/.env.example backend/.env
+```
+
+4. **Configure o banco de dados**
+```bash
+cd backend
+npx prisma migrate dev
+npx prisma db seed
+```
+
+5. **Inicie os serviços**
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run dev
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+### Configuração com Docker
+
+```bash
+# Construir e iniciar todos os serviços
+docker-compose up --build
+
+# Apenas desenvolvimento
+docker-compose -f docker-compose.dev.yml up
+```
+
+## ⚙️ Configuração
+
+### Variáveis de Ambiente
+
+#### Frontend (.env.local)
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+#### Backend (.env)
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/aida
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_KEY=your_supabase_service_key
+
+# AI Services
+OPENAI_API_KEY=your_openai_key
+ANTHROPIC_API_KEY=your_anthropic_key
+
+# WhatsApp
+WHATSAPP_TOKEN=your_whatsapp_token
+WHATSAPP_VERIFY_TOKEN=your_verify_token
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# Security
+JWT_SECRET=your_jwt_secret
+ENCRYPTION_KEY=your_encryption_key
+```
+
+## 📊 Monitoramento e Observabilidade
+
+### Métricas Principais
+- **Latência de resposta**: < 2s para 95% das requisições
+- **Disponibilidade**: 99.9% uptime
+- **Throughput**: 1000+ mensagens/minuto
+- **Precisão RAG**: > 85% relevância
 
 ### Dashboards
-- **Cloudflare Analytics**: Métricas de infraestrutura
-- **Supabase Dashboard**: Métricas de banco de dados
-- **AIDA Dashboard**: Métricas de negócio personalizadas
+- **Grafana**: Métricas de sistema e aplicação
+- **Sentry**: Monitoramento de erros
+- **Supabase**: Métricas de banco de dados
+- **Custom**: Dashboard interno com KPIs
+
+### Logs
+```bash
+# Logs em tempo real
+docker-compose logs -f
+
+# Logs específicos
+docker-compose logs backend
+docker-compose logs frontend
+```
 
 ## 🔒 Segurança
 
-### Autenticação
-- **API Keys** com escopo por tenant
-- **Rate limiting** por negócio
-- **Validação de origem** para webhooks
+### Autenticação e Autorização
+- **JWT**: Tokens seguros com refresh
+- **RBAC**: Controle baseado em roles
+- **MFA**: Autenticação multi-fator
+- **OAuth**: Integração com provedores externos
 
-### Isolamento de Dados
-- **Row Level Security (RLS)** no Supabase
-- **Namespaces separados** no KV Store
-- **Filas dedicadas** por tenant
+### Proteção de Dados
+- **Criptografia**: AES-256 para dados sensíveis
+- **HTTPS**: TLS 1.3 obrigatório
+- **Rate Limiting**: Proteção contra abuse
+- **Input Validation**: Sanitização rigorosa
 
 ### Compliance
-- **LGPD/GDPR** ready
-- **Logs auditáveis**
-- **Criptografia em trânsito e repouso**
+- **LGPD**: Conformidade com lei brasileira
+- **GDPR**: Conformidade europeia
+- **SOC 2**: Controles de segurança
+- **ISO 27001**: Gestão de segurança
 
 ## 🧪 Testes
 
