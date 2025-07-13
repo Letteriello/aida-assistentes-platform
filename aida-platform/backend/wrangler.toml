@@ -1,0 +1,145 @@
+# AIDA Platform - Cloudflare Workers Configuration
+# CRITICAL: Production deployment configuration for the complete AIDA platform
+
+name = "aida-platform-backend"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+# Worker configuration
+[build]
+command = "npm run build"
+
+# Environment variables (secrets managed via wrangler secret)
+[vars]
+ENVIRONMENT = "development"
+LOG_LEVEL = "debug"
+EVOLUTION_API_BASE_URL = "https://api.evolution-api.com"
+WEBHOOK_BASE_URL = "https://aida-platform.your-domain.workers.dev"
+
+# KV Namespaces for caching and session management
+[[kv_namespaces]]
+binding = "CACHE_STORE"
+id = "your-cache-kv-namespace-id"
+preview_id = "your-cache-kv-preview-id"
+
+[[kv_namespaces]]
+binding = "SESSION_STORE"
+id = "your-session-kv-namespace-id"
+preview_id = "your-session-kv-preview-id"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_STORE"
+id = "your-rate-limit-kv-namespace-id"
+preview_id = "your-rate-limit-kv-preview-id"
+
+# Durable Objects for conversation management
+[[durable_objects.bindings]]
+name = "CONVERSATION_MANAGER"
+class_name = "ConversationManager"
+script_name = "aida-platform-backend"
+
+[[durable_objects.bindings]]
+name = "ASSISTANT_PROCESSOR"
+class_name = "AssistantProcessor"
+script_name = "aida-platform-backend"
+
+# Queues for async processing
+[[queues.producers]]
+queue = "embedding-queue"
+binding = "EMBEDDING_QUEUE"
+
+[[queues.producers]]
+queue = "message-queue"
+binding = "MESSAGE_QUEUE"
+
+[[queues.producers]]
+queue = "webhook-queue"
+binding = "WEBHOOK_QUEUE"
+
+[[queues.consumers]]
+queue = "embedding-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+max_retries = 3
+dead_letter_queue = "embedding-dlq"
+
+[[queues.consumers]]
+queue = "message-queue"
+max_batch_size = 5
+max_batch_timeout = 15
+max_retries = 3
+dead_letter_queue = "message-dlq"
+
+[[queues.consumers]]
+queue = "webhook-queue"
+max_batch_size = 20
+max_batch_timeout = 10
+max_retries = 2
+dead_letter_queue = "webhook-dlq"
+
+# R2 Storage for media and backups
+[[r2_buckets]]
+binding = "MEDIA_STORAGE"
+bucket_name = "aida-platform-media"
+preview_bucket_name = "aida-platform-media-preview"
+
+[[r2_buckets]]
+binding = "BACKUP_STORAGE"
+bucket_name = "aida-platform-backups"
+preview_bucket_name = "aida-platform-backups-preview"
+
+# Analytics Engine for monitoring
+[analytics_engine_datasets]
+binding = "ANALYTICS"
+dataset = "aida_platform_analytics"
+
+# AI binding for Cloudflare AI
+[ai]
+binding = "AI"
+
+# Cron triggers for scheduled tasks
+[triggers]
+crons = [
+  "0 */6 * * *",   # Conversation cleanup every 6 hours
+  "0 0 * * *",     # Daily analytics generation
+  "*/5 * * * *",   # Evolution API health check every 5 minutes
+  "0 */12 * * *"   # Vector index optimization every 12 hours
+]
+
+# Development environment overrides
+[env.development]
+name = "aida-platform-backend-dev"
+[env.development.vars]
+ENVIRONMENT = "development"
+LOG_LEVEL = "debug"
+WEBHOOK_BASE_URL = "https://aida-platform-dev.your-domain.workers.dev"
+
+# Staging environment
+[env.staging]
+name = "aida-platform-backend-staging"
+[env.staging.vars]
+ENVIRONMENT = "staging"
+LOG_LEVEL = "info"
+WEBHOOK_BASE_URL = "https://aida-platform-staging.your-domain.workers.dev"
+
+# Production environment
+[env.production]
+name = "aida-platform-backend-prod"
+[env.production.vars]
+ENVIRONMENT = "production"
+LOG_LEVEL = "warn"
+WEBHOOK_BASE_URL = "https://aida-platform.your-domain.workers.dev"
+
+# Limits and performance
+[limits]
+cpu_ms = 30000
+memory_mb = 128
+
+# Observability
+[observability]
+head_sampling_rate = 0.01
+
+# Placement
+[placement]
+mode = "smart"
