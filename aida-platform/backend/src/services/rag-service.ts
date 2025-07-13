@@ -256,7 +256,7 @@ export class RAGService {
     cacheSize: number;
     cacheHitRate: number;
     totalQueries: number;
-  } {
+    } {
     return {
       cacheSize: this.responseCache.size,
       cacheHitRate: 0, // TODO: Implement hit rate tracking
@@ -302,7 +302,7 @@ export class RAGService {
   }
 
   private calculateConfidence(results: RAGResult[]): number {
-    if (results.length === 0) return 0;
+    if (results.length === 0) {return 0;}
     
     const avgScore = results.reduce((sum, result) => sum + result.score, 0) / results.length;
     return Math.min(avgScore, 1.0);
@@ -325,7 +325,7 @@ export class RAGService {
 
   private getCachedResponse(cacheKey: string): RAGResponse | null {
     const cached = this.responseCache.get(cacheKey);
-    if (!cached) return null;
+    if (!cached) {return null;}
 
     // Check if cache entry is still valid
     const now = Date.now();

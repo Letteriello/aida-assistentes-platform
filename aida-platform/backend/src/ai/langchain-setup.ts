@@ -16,7 +16,7 @@ import { Document } from '@langchain/core/documents';
 
 import { HybridQueryEngine, HybridSearchResponse as HybridQueryResult } from '../rag/hybrid-query-engine';
 import { TenantAwareSupabase } from '../database/supabase-client';
-import type { AIResponse, Assistant, Conversation } from '@shared/types';
+import type { AIResponse, Assistant, Conversation, RAGQuery } from '@shared/types';
 
 export interface LangChainConfig {
   provider: 'openai' | 'anthropic';
@@ -60,6 +60,7 @@ export interface ProcessingOptions {
 class AIDARetriever extends BaseRetriever {
   private hybridQueryEngine: HybridQueryEngine;
   private businessId: string;
+  lc_namespace = ['aida', 'retriever'];
 
   constructor(hybridQueryEngine: HybridQueryEngine, businessId: string) {
     super();
@@ -67,7 +68,7 @@ class AIDARetriever extends BaseRetriever {
     this.businessId = businessId;
   }
 
-  async _getRelevantDocuments(query: string): Promise<Document[]> {
+  override async _getRelevantDocuments(query: string): Promise<Document[]> {
     try {
       const ragQuery: RAGQuery = {
         query,
@@ -81,9 +82,10 @@ class AIDARetriever extends BaseRetriever {
       return result.results.map(ragResult => new Document({
         pageContent: ragResult.content,
         metadata: {
-          source: ragResult.source,
-          score: ragResult.score,
-          source_id: ragResult.source_id,
+          sources: ragResult.sources,
+          similarity: ragResult.similarity,
+          id: ragResult.id,
+          fusionScore: ragResult.fusionScore,
           ...ragResult.metadata
         }
       }));
@@ -100,7 +102,7 @@ class AIDARetriever extends BaseRetriever {
  */
 export class LangChainProcessor {
   private config: LangChainConfig;
-  private llm: ChatOpenAI | ChatAnthropic;
+  private llm!: ChatOpenAI | ChatAnthropic;
   private memoryStore: Map<string, BufferWindowMemory | ConversationSummaryMemory> = new Map();
 
   constructor(config: LangChainConfig) {
@@ -180,8 +182,8 @@ export class LangChainProcessor {
       const processingTime = performance.now() - startTime;
 
       return {
-        content: response.output || response,
-        confidence,
+        response: response.output || response,
+        confidence_score: confidence,
         sources: response.sources || [],
         processing_time_ms: processingTime,
         should_escalate: false,
@@ -298,8 +300,7 @@ Respond as ${assistant.name} would, using the provided context and conversation 
     if (!memory) {
       if (this.config.memoryType === 'summary') {
         memory = new ConversationSummaryMemory({
-          llm: this.llm,
-          maxTokenLimit: this.config.maxTokens * 0.3 // Use 30% of tokens for memory
+          llm: this.llm
         });
       } else {
         memory = new BufferWindowMemory({
@@ -494,8 +495,8 @@ Respond as ${assistant.name} would, using the provided context and conversation 
     };
 
     return {
-      content: escalationMessages.professional, // Default to professional
-      confidence: 0.9, // High confidence in escalation decision
+      response: escalationMessages.professional, // Default to professional
+      confidence_score: 0.9, // High confidence in escalation decision
       sources: [],
       processing_time_ms: performance.now() - startTime,
       should_escalate: true,
@@ -514,8 +515,8 @@ Respond as ${assistant.name} would, using the provided context and conversation 
     startTime: number
   ): AIResponse {
     return {
-      content: 'I apologize, but I\'m experiencing some technical difficulties right now. Let me connect you with a human agent who can assist you better.',
-      confidence: 0.3,
+      response: 'I apologize, but I\'m experiencing some technical difficulties right now. Let me connect you with a human agent who can assist you better.',
+      confidence_score: 0.3,
       sources: [],
       processing_time_ms: performance.now() - startTime,
       should_escalate: true,

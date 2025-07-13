@@ -34,7 +34,7 @@ afterAll(() => {
 // Mock Server Worker setup for API mocking
 const server = setupServer(
   // Evolution API mocks
-  rest.post('http://localhost:8080/message/sendText/:instanceName', (req, res, ctx) => {
+  rest.post('http://localhost:8080/message/sendText/:instanceName', (req: any, res: any, ctx: any) => {
     return res(
       ctx.json({
         key: {
@@ -49,7 +49,7 @@ const server = setupServer(
     );
   }),
 
-  rest.post('http://localhost:8080/instance/create', (req, res, ctx) => {
+  rest.post('http://localhost:8080/instance/create', (req: any, res: any, ctx: any) => {
     return res(
       ctx.json({
         instanceName: 'mock-instance',
@@ -279,7 +279,7 @@ export const testHelpers = {
       status: 'active',
       priority: 'medium',
       context_summary: 'Test conversation',
-      created_at: new Date(),
+      created_at: new Date().toISOString(),
       last_message_at: new Date()
     },
     businessId: 'test-business-id',

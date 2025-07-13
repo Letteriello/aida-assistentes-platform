@@ -74,9 +74,9 @@ export class ConversationHistoryManager {
             messageCount: 0
           }
         },
-        created_at: new Date(),
+        created_at: new Date().toISOString(),
         last_message_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date().toISOString()
       };
 
       const { data: createdConversation, error: createError } = await this.supabase
@@ -336,7 +336,7 @@ export class ConversationHistoryManager {
         resolution_status: summary.resolutionStatus,
         embeddings: embedding,
         message_count: messages.length,
-        created_at: new Date()
+        created_at: new Date().toISOString()
       };
 
       await this.supabase
@@ -429,7 +429,7 @@ export class ConversationHistoryManager {
         .from('conversations')
         .update({ 
           last_message_at: new Date(),
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         })
         .eq('id', conversationId);
 

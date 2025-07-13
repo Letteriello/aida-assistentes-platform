@@ -26,6 +26,7 @@ import { createMemoryIntegrator, MemoryIntegrator } from './memory/memory-integr
 import { BusinessAuthHandler } from './auth/business-auth';
 import { AssistantAPI } from './api/assistants';
 import { ConversationAPI } from './api/conversations';
+import dashboardRoutes from './api/dashboard';
 
 // Utilities and types
 import { getSecurityHeaders, logSecurityEvent } from './database/security';
@@ -181,7 +182,7 @@ app.use('*', async (c, next) => {
 
     const webhookHandler = createWebhookHandler({
       supabase,
-      onMessageProcessed: async (result) => {
+      onMessageProcessed: async (result: any) => {
         if (result.success && result.shouldRespond) {
           // Queue AI response generation
           await c.env.MESSAGE_QUEUE.send({
@@ -191,7 +192,7 @@ app.use('*', async (c, next) => {
           });
         }
       },
-      onError: (error) => {
+      onError: (error: any) => {
         console.error('Webhook processing error:', error);
         logSecurityEvent('webhook_error', error, businessId);
       }
@@ -223,6 +224,7 @@ app.use('*', async (c, next) => {
 app.route('/auth', BusinessAuthHandler);
 app.route('/api/assistants', AssistantAPI);
 app.route('/api/conversations', ConversationAPI);
+app.route('/api/dashboard', dashboardRoutes);
 
 // Health check endpoint
 app.get('/health', async (c) => {

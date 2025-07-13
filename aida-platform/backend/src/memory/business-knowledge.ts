@@ -72,8 +72,8 @@ export class BusinessKnowledgeManager {
         status: 'active',
         confidence: 1.0,
         tags: this.extractTags(sanitizedContent),
-        created_at: new Date(),
-        updated_at: new Date()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       const { data: createdNode, error } = await this.supabase
@@ -134,8 +134,8 @@ export class BusinessKnowledgeManager {
         properties: this.sanitizeProperties(properties),
         confidence,
         status: 'active',
-        created_at: new Date(),
-        updated_at: new Date()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       const { data: createdRelationship, error } = await this.supabase
@@ -386,7 +386,7 @@ export class BusinessKnowledgeManager {
 
       // Create update data
       const updateData: Partial<KnowledgeNode> = {
-        updated_at: new Date(),
+        updated_at: new Date().toISOString(),
         version: currentNode.version + 1
       };
 
@@ -560,7 +560,7 @@ export class BusinessKnowledgeManager {
         content: node.content,
         properties: node.properties,
         embeddings: node.embeddings,
-        created_at: new Date()
+        created_at: new Date().toISOString()
       };
 
       await this.supabase

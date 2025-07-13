@@ -1,152 +1,78 @@
-'use client';
+import Link from "next/link";
+import { Bell, Home, Users, Bot, MessageSquare, Settings } from "lucide-react";
 
-import { useAuth } from '@/components/providers';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { 
-  LayoutDashboard, 
-  Bot, 
-  MessageSquare, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  LogOut,
-  Menu,
-  X
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Assistentes', href: '/assistants', icon: Bot },
-  { name: 'Conversas', href: '/conversations', icon: MessageSquare },
-  { name: 'Clientes', href: '/customers', icon: Users },
-  { name: 'Análises', href: '/analytics', icon: BarChart3 },
-  { name: 'Configurações', href: '/settings', icon: Settings },
-];
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { business, signOut } = useAuth();
-  const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
-            <div className="absolute top-0 right-0 -mr-12 pt-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                onClick={() => setSidebarOpen(false)}
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Bot className="h-6 w-6" />
+              <span className="">AIDA Platform</span>
+            </Link>
+            <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
+              <Bell className="h-4 w-4" />
+              <span className="sr-only">Toggle notifications</span>
+            </Button>
+          </div>
+          <div className="flex-1">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
-                <X className="h-6 w-6 text-white" />
-              </Button>
-            </div>
-            <SidebarContent />
+                <Home className="h-4 w-4" />
+                Dashboard
+              </Link>
+              <Link
+                href="/assistants"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Bot className="h-4 w-4" />
+                Assistants
+              </Link>
+              <Link
+                href="/conversations"
+                className="flex items-center gap-3 rounded-lg bg-accent px-3 py-2 text-primary transition-all hover:text-primary"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Conversations
+              </Link>
+              <Link
+                href="/settings"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Settings className="h-4 w-4" />
+                Settings
+              </Link>
+            </nav>
+          </div>
+          <div className="mt-auto p-4">
+            <Card x-chunk="dashboard-02-chunk-0">
+              <CardHeader className="p-2 pt-0 md:p-4">
+                <CardTitle>Upgrade to Pro</CardTitle>
+                <CardDescription>
+                  Unlock all features and get unlimited access to our support team.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
+                <Button size="sm" className="w-full">
+                  Upgrade
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      )}
-
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <SidebarContent />
       </div>
-
-      {/* Main content */}
-      <div className="flex flex-1 flex-col lg:pl-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white shadow">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-          
-          <div className="flex flex-1 justify-between px-4">
-            <div className="flex flex-1">
-              <div className="flex w-full md:ml-0">
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center">
-                    <span className="text-sm font-medium">{business?.name}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="ml-4 flex items-center md:ml-6">
-              <Button variant="outline" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Page content */}
-        <main className="flex-1">
+      <div className="flex flex-col">
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           {children}
         </main>
       </div>
     </div>
   );
-
-  function SidebarContent() {
-    return (
-      <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white">
-        <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-          <div className="flex flex-shrink-0 items-center px-4">
-            <div className="flex items-center">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
-                <Bot className="h-5 w-5 text-white" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">AIDA Platform</p>
-                <p className="text-xs text-gray-500">WhatsApp AI</p>
-              </div>
-            </div>
-          </div>
-          
-          <nav className="mt-5 flex-1 space-y-1 bg-white px-2">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    isActive
-                      ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                      : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'group flex items-center pl-3 pr-2 py-2 border-l-4 text-sm font-medium'
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      isActive ? 'text-indigo-500' : 'text-gray-400 group-hover:text-gray-500',
-                      'mr-3 h-5 w-5'
-                    )}
-                  />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
-    );
-  }
 }

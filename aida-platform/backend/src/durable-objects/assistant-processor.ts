@@ -1,11 +1,11 @@
-import { DurableObject } from "@cloudflare/workers-types";
-import { z } from "zod";
-import { ConversationHistoryManager } from "../services/conversation-history-manager";
-import { AIOrchestrator } from "../services/ai-orchestrator";
-import { RAGService } from "../services/rag-service";
-import { logger } from "../utils/logger";
-import { rateLimiter } from "../utils/rate-limiter";
-import { validateInput } from "../utils/validation";
+import { DurableObject } from '@cloudflare/workers-types';
+import { z } from 'zod';
+import { ConversationHistoryManager } from '../services/conversation-history-manager';
+import { AIOrchestrator } from '../services/ai-orchestrator';
+import { RAGService } from '../services/rag-service';
+import { logger } from '../utils/logger';
+import { rateLimiter } from '../utils/rate-limiter';
+import { validateInput } from '../utils/validation';
 
 // Schemas de validação
 const ProcessMessageSchema = z.object({
@@ -15,8 +15,8 @@ const ProcessMessageSchema = z.object({
   businessId: z.string().uuid(),
   assistantId: z.string().uuid(),
   metadata: z.object({
-    platform: z.enum(["whatsapp", "web", "api"]),
-    messageType: z.enum(["text", "image", "audio", "document"]),
+    platform: z.enum(['whatsapp', 'web', 'api']),
+    messageType: z.enum(['text', 'image', 'audio', 'document']),
     timestamp: z.string().datetime(),
     sessionId: z.string().optional(),
     userAgent: z.string().optional(),
@@ -30,14 +30,14 @@ const UpdateAssistantSchema = z.object({
     name: z.string().min(1).max(100),
     description: z.string().max(500).optional(),
     instructions: z.string().max(2000),
-    model: z.enum(["gpt-4", "gpt-3.5-turbo", "claude-3-sonnet", "claude-3-haiku"]),
+    model: z.enum(['gpt-4', 'gpt-3.5-turbo', 'claude-3-sonnet', 'claude-3-haiku']),
     temperature: z.number().min(0).max(2).default(0.7),
     maxTokens: z.number().min(100).max(4000).default(1000),
     enableRAG: z.boolean().default(true),
     enableMemory: z.boolean().default(true),
-    responseStyle: z.enum(["formal", "casual", "technical", "friendly"]).default("friendly"),
-    language: z.string().default("pt-BR"),
-    timezone: z.string().default("America/Sao_Paulo")
+    responseStyle: z.enum(['formal', 'casual', 'technical', 'friendly']).default('friendly'),
+    language: z.string().default('pt-BR'),
+    timezone: z.string().default('America/Sao_Paulo')
   })
 });
 
@@ -82,7 +82,7 @@ export class AssistantProcessor extends DurableObject {
     super(state, env);
     
     this.state = {
-      assistantId: "",
+      assistantId: '',
       config: {},
       activeConversations: new Map(),
       processingQueue: [],
@@ -99,7 +99,7 @@ export class AssistantProcessor extends DurableObject {
     this.aiOrchestrator = new AIOrchestrator({
       openaiApiKey: env.OPENAI_API_KEY,
       anthropicApiKey: env.ANTHROPIC_API_KEY,
-      defaultModel: "gpt-4"
+      defaultModel: 'gpt-4'
     });
     this.ragService = new RAGService({
       supabaseUrl: env.SUPABASE_URL,
@@ -113,7 +113,7 @@ export class AssistantProcessor extends DurableObject {
   private async initializeProcessor(): Promise<void> {
     try {
       // Carregar estado persistido
-      const persistedState = await this.state.storage.get("assistantState");
+      const persistedState = await this.state.storage.get('assistantState');
       if (persistedState) {
         this.state = {
           ...this.state,
@@ -127,13 +127,13 @@ export class AssistantProcessor extends DurableObject {
       this.startProcessing();
       this.startCleanup();
 
-      logger.info("AssistantProcessor initialized", {
+      logger.info('AssistantProcessor initialized', {
         assistantId: this.state.assistantId,
         activeConversations: this.state.activeConversations.size,
         queueSize: this.state.processingQueue.length
       });
     } catch (error) {
-      logger.error("Failed to initialize AssistantProcessor", { error });
+      logger.error('Failed to initialize AssistantProcessor', { error });
       throw error;
     }
   }
@@ -172,12 +172,12 @@ export class AssistantProcessor extends DurableObject {
     });
 
     const item = this.state.processingQueue.shift();
-    if (!item) return;
+    if (!item) {return;}
 
     try {
       await this.processMessage(item);
     } catch (error) {
-      logger.error("Failed to process message", {
+      logger.error('Failed to process message', {
         messageId: item.id,
         conversationId: item.conversationId,
         error
@@ -198,7 +198,7 @@ export class AssistantProcessor extends DurableObject {
     try {
       // Verificar rate limiting
       if (!this.checkRateLimit(item.userId)) {
-        throw new Error("Rate limit exceeded");
+        throw new Error('Rate limit exceeded');
       }
 
       // Obter contexto da conversa
@@ -230,7 +230,7 @@ export class AssistantProcessor extends DurableObject {
 
       // Salvar resposta na conversa
       await this.conversationManager.addMessage(item.conversationId, {
-        role: "assistant",
+        role: 'assistant',
         content: response.content,
         metadata: {
           model: response.model,
@@ -251,7 +251,7 @@ export class AssistantProcessor extends DurableObject {
         context: conversationContext.slice(-10) // Manter apenas últimas 10 mensagens
       });
 
-      logger.info("Message processed successfully", {
+      logger.info('Message processed successfully', {
         messageId: item.id,
         conversationId: item.conversationId,
         processingTime: Date.now() - startTime,
@@ -259,7 +259,7 @@ export class AssistantProcessor extends DurableObject {
       });
 
     } catch (error) {
-      logger.error("Error processing message", {
+      logger.error('Error processing message', {
         messageId: item.id,
         conversationId: item.conversationId,
         error: error.message
@@ -276,7 +276,7 @@ export class AssistantProcessor extends DurableObject {
       );
       return history.messages || [];
     } catch (error) {
-      logger.error("Failed to get conversation context", { conversationId, error });
+      logger.error('Failed to get conversation context', { conversationId, error });
       return [];
     }
   }
@@ -335,7 +335,7 @@ export class AssistantProcessor extends DurableObject {
     // Persistir estado limpo
     await this.persistState();
 
-    logger.debug("Cleanup completed", {
+    logger.debug('Cleanup completed', {
       activeConversations: this.state.activeConversations.size,
       rateLimits: this.state.rateLimits.size
     });
@@ -343,13 +343,13 @@ export class AssistantProcessor extends DurableObject {
 
   private async persistState(): Promise<void> {
     try {
-      await this.state.storage.put("assistantState", {
+      await this.state.storage.put('assistantState', {
         ...this.state,
         activeConversations: Array.from(this.state.activeConversations.entries()),
         rateLimits: Array.from(this.state.rateLimits.entries())
       });
     } catch (error) {
-      logger.error("Failed to persist state", { error });
+      logger.error('Failed to persist state', { error });
     }
   }
 
@@ -360,29 +360,29 @@ export class AssistantProcessor extends DurableObject {
       const method = request.method;
 
       switch (`${method} ${url.pathname}`) {
-        case "POST /process":
-          return await this.handleProcessMessage(request);
+      case 'POST /process':
+        return await this.handleProcessMessage(request);
         
-        case "PUT /config":
-          return await this.handleUpdateConfig(request);
+      case 'PUT /config':
+        return await this.handleUpdateConfig(request);
         
-        case "GET /status":
-          return await this.handleGetStatus();
+      case 'GET /status':
+        return await this.handleGetStatus();
         
-        case "GET /performance":
-          return await this.handleGetPerformance();
+      case 'GET /performance':
+        return await this.handleGetPerformance();
         
-        case "POST /priority":
-          return await this.handleSetPriority(request);
+      case 'POST /priority':
+        return await this.handleSetPriority(request);
         
-        default:
-          return new Response("Not Found", { status: 404 });
+      default:
+        return new Response('Not Found', { status: 404 });
       }
     } catch (error) {
-      logger.error("Error handling request", { error });
-      return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      logger.error('Error handling request', { error });
+      return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
         status: 500,
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     }
   }
@@ -409,12 +409,12 @@ export class AssistantProcessor extends DurableObject {
         messageId,
         queuePosition: this.state.processingQueue.length
       }), {
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     } catch (error) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     }
   }
@@ -434,12 +434,12 @@ export class AssistantProcessor extends DurableObject {
         assistantId: this.state.assistantId,
         config: this.state.config
       }), {
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     } catch (error) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     }
   }
@@ -452,7 +452,7 @@ export class AssistantProcessor extends DurableObject {
       performance: this.state.performance,
       uptime: Date.now() - (this.state.performance.lastProcessedAt || Date.now())
     }), {
-      headers: { "Content-Type": "application/json" }
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 
@@ -471,7 +471,7 @@ export class AssistantProcessor extends DurableObject {
           : null
       }
     }), {
-      headers: { "Content-Type": "application/json" }
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 
@@ -483,18 +483,18 @@ export class AssistantProcessor extends DurableObject {
       if (message) {
         message.priority = priority;
         return new Response(JSON.stringify({ success: true }), {
-          headers: { "Content-Type": "application/json" }
+          headers: { 'Content-Type': 'application/json' }
         });
       }
 
-      return new Response(JSON.stringify({ error: "Message not found" }), {
+      return new Response(JSON.stringify({ error: 'Message not found' }), {
         status: 404,
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     } catch (error) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
-        headers: { "Content-Type": "application/json" }
+        headers: { 'Content-Type': 'application/json' }
       });
     }
   }
@@ -510,7 +510,7 @@ export class AssistantProcessor extends DurableObject {
     
     await this.persistState();
     
-    logger.info("AssistantProcessor cleanup completed", {
+    logger.info('AssistantProcessor cleanup completed', {
       assistantId: this.state.assistantId
     });
   }

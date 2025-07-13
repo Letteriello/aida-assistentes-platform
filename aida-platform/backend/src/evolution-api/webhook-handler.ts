@@ -1,13 +1,9 @@
 
 import { getEvolutionAPIClient } from './client';
 import { getSupabaseClient } from '../database/supabase-client';
+import { processMessageWithAI } from '../ai/ai-processor';
 
-// This is a placeholder for the actual AI processing logic
-const processMessageWithAI = async (message: string, conversationContext: any, knowledgeGraphId: string) => {
-  // In a real application, this would involve a call to a large language model
-  // with the message, conversation context, and knowledge graph information.
-  return `ECHO: ${message}`;
-};
+// AI processing is now handled by the dedicated AI processor module
 
 export const handleWhatsAppWebhook = async (req: any, res: any) => {
   const { instance, data, pusher } = req.body;
@@ -65,7 +61,13 @@ export const handleWhatsAppWebhook = async (req: any, res: any) => {
     }
 
     // 3. Process the message with the AI
-    const response = await processMessageWithAI(message, conversationContext, assistant.knowledge_graph_id);
+    const response = await processMessageWithAI(
+      message,
+      assistant.id,
+      conversation?.id || null,
+      assistant.business_id,
+      supabase
+    );
 
     // 4. Send the response back to the user
     await evolutionAPI.sendTextMessage(instance, remoteJid, response);

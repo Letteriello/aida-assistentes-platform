@@ -534,6 +534,30 @@ export class EmbeddingService {
       return false;
     }
   }
+
+  /**
+   * Queue embedding request for async processing
+   * PATTERN: Async queue processing for better performance
+   */
+  async queueEmbeddingRequest(request: EmbeddingRequest): Promise<void> {
+    try {
+      if (this.env.EMBEDDING_QUEUE) {
+        await this.env.EMBEDDING_QUEUE.send({
+          id: request.id,
+          content: request.content,
+          businessId: this.supabase.businessId,
+          metadata: request.metadata || {}
+        });
+      } else {
+        // Fallback: process immediately if queue not available
+        console.warn('Embedding queue not available, processing immediately');
+        await this.generateEmbedding(request.content);
+      }
+    } catch (error) {
+      console.error('Failed to queue embedding request:', error);
+      throw new Error(`Failed to queue embedding request: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }
 
 /**

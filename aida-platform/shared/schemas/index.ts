@@ -357,3 +357,36 @@ export type HealthCheckResponse = z.infer<typeof healthCheckResponseSchema>
 export type StatsResponse = z.infer<typeof statsResponseSchema>
 export type VectorSearchRequest = z.infer<typeof vectorSearchRequestSchema>
 export type VectorSearchResult = z.infer<typeof vectorSearchResultSchema>
+
+// Missing schemas causing TS2305 errors
+export const PaginationSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  limit: z.number().int().min(1).max(100).default(10),
+  sort_by: z.string().optional(),
+  sort_order: z.enum(['asc', 'desc']).default('desc')
+})
+
+export const ExportRequestSchema = z.object({
+  format: z.enum(['csv', 'json', 'xlsx']).default('csv'),
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional(),
+  filters: z.record(z.any()).optional(),
+  include_metadata: z.boolean().default(false)
+})
+
+export type PaginationRequest = z.infer<typeof PaginationSchema>
+export type ExportRequest = z.infer<typeof ExportRequestSchema>
+
+// Missing schema aliases for backward compatibility (fixing TS2724 errors)
+export const AssistantCreateSchema = assistantInsertSchema
+export const AssistantTestSchema = assistantSchema
+export const AssistantUpdateSchema = assistantUpdateSchema
+export const ConversationFilterSchema = z.object({
+  status: z.array(z.enum(['active', 'resolved', 'escalated', 'archived'])).optional(),
+  date_range: z.object({
+    start: z.string().datetime(),
+    end: z.string().datetime()
+  }).optional(),
+  customer_name: z.string().optional(),
+  assistant_id: z.string().uuid().optional()
+})

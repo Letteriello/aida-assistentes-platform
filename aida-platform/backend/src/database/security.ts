@@ -75,3 +75,65 @@ export const formatDatabaseError = (error: unknown): string => {
   }
   return 'An unknown database error occurred.';
 };
+
+// Missing export that is imported in other files (fixing TS2305 errors)
+export interface SecurityEvent {
+  event_type: string
+  details: Record<string, any>
+  business_id: string
+  timestamp?: Date
+  severity?: 'low' | 'medium' | 'high' | 'critical'
+}
+
+export function logSecurityEvent(
+  eventType: string,
+  details: Record<string, any>,
+  businessId: string
+): void {
+  // Simple implementation for compatibility - logs to console
+  // In production, this would send to security monitoring system
+  console.warn(`[SECURITY] ${eventType}:`, { 
+    details, 
+    businessId, 
+    timestamp: new Date().toISOString() 
+  });
+}
+
+// Missing exports that are imported in other files (fixing TS2305 errors)
+export function sanitizeInput(input: string): string {
+  // Basic input sanitization - in production this would be more comprehensive
+  return input
+    .replace(/[<>"'&]/g, '') // Remove basic HTML/JS injection chars
+    .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+    .trim();
+}
+
+export function validateInput(
+  input: string, 
+  options: {
+    minLength?: number;
+    maxLength?: number;
+    allowEmpty?: boolean;
+    pattern?: RegExp;
+  } = {}
+): { isValid: boolean; error?: string } {
+  const { minLength = 0, maxLength = 1000, allowEmpty = false, pattern } = options;
+  
+  if (!allowEmpty && (!input || input.trim().length === 0)) {
+    return { isValid: false, error: 'Input cannot be empty' };
+  }
+  
+  if (input.length < minLength) {
+    return { isValid: false, error: `Input must be at least ${minLength} characters` };
+  }
+  
+  if (input.length > maxLength) {
+    return { isValid: false, error: `Input must not exceed ${maxLength} characters` };
+  }
+  
+  if (pattern && !pattern.test(input)) {
+    return { isValid: false, error: 'Input format is invalid' };
+  }
+  
+  return { isValid: true };
+}

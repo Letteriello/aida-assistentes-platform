@@ -210,6 +210,72 @@ export class TenantAwareSupabase {
       };
     }
   }
+
+  /**
+   * Generic query method with tenant isolation
+   * PATTERN: Compatibility method for existing code
+   */
+  async query<T>(table: string, select: string, filters?: Record<string, any>): Promise<T[]> {
+    const { data, error } = await this.client
+      .from(table)
+      .select(select)
+      .eq('business_id', this.businessId);
+    
+    if (error) {throw error;}
+    return data || [];
+  }
+
+  /**
+   * Generic update method with tenant isolation
+   * PATTERN: Tenant-safe update operations
+   */
+  async update<T>(table: string, id: string, updates: Partial<T>): Promise<T> {
+    const { data, error } = await this.client
+      .from(table)
+      .update(updates)
+      .eq('id', id)
+      .eq('business_id', this.businessId)
+      .single();
+    
+    if (error) {throw error;}
+    return data;
+  }
+
+  /**
+   * Get service client for compatibility
+   * PATTERN: Backward compatibility accessor
+   */
+  getServiceClient(): SupabaseClient<Database> {
+    return this.serviceClient;
+  }
+
+  /**
+   * Get from method for compatibility with existing API code
+   * PATTERN: Supabase client interface compatibility
+   */
+  from(table: string) {
+    return this.client.from(table);
+  }
+
+  /**
+   * Insert method with tenant isolation
+   * PATTERN: Tenant-safe insert operations
+   */
+  async insert<T>(table: string, values: Partial<T> | Partial<T>[]): Promise<T[]> {
+    const data = Array.isArray(values) ? values : [values];
+    const dataWithBusinessId = data.map(item => ({
+      ...item,
+      business_id: this.businessId
+    }));
+
+    const { data: result, error } = await this.client
+      .from(table)
+      .insert(dataWithBusinessId)
+      .select();
+    
+    if (error) {throw error;}
+    return result || [];
+  }
 }
 
 /**
@@ -219,6 +285,12 @@ export class TenantAwareSupabase {
 export function getSupabase(config: SupabaseConfig, businessId: string): TenantAwareSupabase {
   return new TenantAwareSupabase(config, businessId);
 }
+
+/**
+ * Type alias for backward compatibility
+ */
+export { TenantAwareSupabase };
+export type { SupabaseConfig };
 
 /**
  * Legacy function for backward compatibility

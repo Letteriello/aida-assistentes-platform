@@ -588,10 +588,10 @@ describe('HybridQueryEngine', () => {
     it('should update search weights and thresholds', () => {
       hybridQueryEngine.updateConfig({
         vectorWeight: 0.6,
-        textWeight: 0.25,
-        graphWeight: 0.15,
-        combinedThreshold: 0.6,
-        maxCombinedResults: 15
+        keywordWeight: 0.4,
+        maxVectorResults: 25,
+        maxKeywordResults: 25,
+        finalResultLimit: 15
       });
 
       // Configuration should be updated (can't directly test private config)
@@ -618,22 +618,23 @@ describe('Factory functions', () => {
       maxCombinedResults: 10
     };
 
-    const engine = createHybridQueryEngine(mockDependencies);
+    const config = getDefaultHybridQueryConfig();
+    const engine = createHybridQueryEngine(
+      config,
+      mockDependencies.vectorSearchEngine,
+      mockDependencies.embeddingService,
+      mockDependencies.supabase,
+      {} as any // CloudflareEnv
+    );
     expect(engine).toBeInstanceOf(HybridQueryEngine);
   });
 
   it('should provide default configuration', () => {
-    const mockDependencies = {
-      vectorSearchEngine: { healthCheck: vi.fn() },
-      embeddingService: testHelpers.createMockEmbeddingService(),
-      supabase: testHelpers.createMockSupabase()
-    };
-
-    const config = getDefaultHybridConfig(mockDependencies);
+    const config = getDefaultHybridQueryConfig();
     
-    expect(config).toHaveProperty('vectorWeight', 0.5);
-    expect(config).toHaveProperty('textWeight', 0.3);
-    expect(config).toHaveProperty('graphWeight', 0.2);
+    expect(config).toHaveProperty('vectorWeight', 0.7);
+    expect(config).toHaveProperty('keywordWeight', 0.3);
+    expect(config).toHaveProperty('fusionAlgorithm');
     expect(config).toHaveProperty('vectorThreshold', 0.7);
     expect(config).toHaveProperty('textThreshold', 0.6);
     expect(config).toHaveProperty('combinedThreshold', 0.5);

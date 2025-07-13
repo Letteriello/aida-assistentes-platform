@@ -40,7 +40,7 @@ class MockTenantAwareSupabase {
 
     return mockResults
       .filter(result => result.similarity >= threshold)
-      .slice(0, limit) as Array<T & { similarity: number }>;
+      .slice(0, limit) as unknown as Array<T & { similarity: number }>;
   }
 
   async query<T>(table: string, select: string, filters?: Record<string, any>): Promise<T[]> {
@@ -53,14 +53,14 @@ class MockTenantAwareSupabase {
   }
 }
 
-describe('VectorSearchEngine', () => {
-  let searchEngine: VectorSearchEngine;
+describe('VectorSearchService', () => {
+  let searchEngine: VectorSearchService;
   let mockSupabase: MockTenantAwareSupabase;
 
   beforeEach(() => {
     mockSupabase = new MockTenantAwareSupabase();
     
-    searchEngine = createVectorSearchEngine({
+    searchEngine = new VectorSearchService({
       supabase: mockSupabase as any,
       defaultThreshold: 0.7,
       defaultLimit: 10,
@@ -324,14 +324,14 @@ describe('Factory functions', () => {
   it('should create vector search engine with factory function', () => {
     const mockSupabase = new MockTenantAwareSupabase();
     
-    const engine = createVectorSearchEngine({
+    const engine = new VectorSearchService({
       supabase: mockSupabase as any,
       defaultThreshold: 0.7,
       defaultLimit: 10,
       embeddingDimension: 384
     });
 
-    expect(engine).toBeInstanceOf(VectorSearchEngine);
+    expect(engine).toBeInstanceOf(VectorSearchService);
   });
 
   it('should provide default configuration', () => {

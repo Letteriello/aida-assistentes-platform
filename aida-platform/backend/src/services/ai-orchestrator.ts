@@ -4,15 +4,15 @@
  * Provides a unified interface for AI interactions across the platform
  */
 
-import { z } from "zod";
-import { logger } from "../utils/logger";
-import { validateInput } from "../utils/validation";
+import { z } from 'zod';
+import { logger } from '../utils/logger';
+import { validateInput } from '../utils/validation';
 
 // Schemas de validação
 const GenerateResponseSchema = z.object({
   message: z.string().min(1).max(4000),
   conversationHistory: z.array(z.object({
-    role: z.enum(["user", "assistant", "system"]),
+    role: z.enum(['user', 'assistant', 'system']),
     content: z.string(),
     timestamp: z.number().optional(),
     metadata: z.record(z.any()).optional()
@@ -28,11 +28,11 @@ const GenerateResponseSchema = z.object({
   assistantConfig: z.object({
     name: z.string(),
     instructions: z.string(),
-    model: z.enum(["gpt-4", "gpt-3.5-turbo", "claude-3-sonnet", "claude-3-haiku"]),
+    model: z.enum(['gpt-4', 'gpt-3.5-turbo', 'claude-3-sonnet', 'claude-3-haiku']),
     temperature: z.number().min(0).max(2).default(0.7),
     maxTokens: z.number().min(100).max(4000).default(1000),
-    responseStyle: z.enum(["formal", "casual", "technical", "friendly"]).default("friendly"),
-    language: z.string().default("pt-BR")
+    responseStyle: z.enum(['formal', 'casual', 'technical', 'friendly']).default('friendly'),
+    language: z.string().default('pt-BR')
   }),
   userId: z.string().uuid(),
   businessId: z.string().uuid()
@@ -48,7 +48,7 @@ export interface AIProvider {
 export interface GenerateResponseParams {
   model: string;
   messages: Array<{
-    role: "user" | "assistant" | "system";
+    role: 'user' | 'assistant' | 'system';
     content: string;
   }>;
   temperature?: number;
@@ -65,7 +65,7 @@ export interface AIResponse {
     total: number;
   };
   confidence?: number;
-  finishReason: "stop" | "length" | "content_filter" | "error";
+  finishReason: 'stop' | 'length' | 'content_filter' | 'error';
   processingTime: number;
   provider: string;
 }
@@ -94,8 +94,8 @@ export interface OrchestratorStats {
 
 // OpenAI Provider
 class OpenAIProvider implements AIProvider {
-  name = "openai";
-  models = ["gpt-4", "gpt-3.5-turbo"];
+  name = 'openai';
+  models = ['gpt-4', 'gpt-3.5-turbo'];
   private apiKey: string;
 
   constructor(apiKey: string) {
@@ -106,11 +106,11 @@ class OpenAIProvider implements AIProvider {
     const startTime = Date.now();
     
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
         headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
-          "Content-Type": "application/json"
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: params.model,
@@ -142,16 +142,16 @@ class OpenAIProvider implements AIProvider {
         provider: this.name
       };
     } catch (error) {
-      logger.error("OpenAI provider error", { error, model: params.model });
+      logger.error('OpenAI provider error', { error, model: params.model });
       throw error;
     }
   }
 
   async isAvailable(): Promise<boolean> {
     try {
-      const response = await fetch("https://api.openai.com/v1/models", {
+      const response = await fetch('https://api.openai.com/v1/models', {
         headers: {
-          "Authorization": `Bearer ${this.apiKey}`
+          'Authorization': `Bearer ${this.apiKey}`
         }
       });
       return response.ok;
@@ -163,8 +163,8 @@ class OpenAIProvider implements AIProvider {
 
 // Anthropic Provider
 class AnthropicProvider implements AIProvider {
-  name = "anthropic";
-  models = ["claude-3-sonnet", "claude-3-haiku"];
+  name = 'anthropic';
+  models = ['claude-3-sonnet', 'claude-3-haiku'];
   private apiKey: string;
 
   constructor(apiKey: string) {
@@ -176,15 +176,15 @@ class AnthropicProvider implements AIProvider {
     
     try {
       // Converter mensagens para formato Anthropic
-      const systemMessage = params.messages.find(m => m.role === "system");
-      const conversationMessages = params.messages.filter(m => m.role !== "system");
+      const systemMessage = params.messages.find(m => m.role === 'system');
+      const conversationMessages = params.messages.filter(m => m.role !== 'system');
 
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
         headers: {
-          "x-api-key": this.apiKey,
-          "Content-Type": "application/json",
-          "anthropic-version": "2023-06-01"
+          'x-api-key': this.apiKey,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
           model: params.model,
@@ -192,7 +192,7 @@ class AnthropicProvider implements AIProvider {
           temperature: params.temperature || 0.7,
           system: systemMessage?.content,
           messages: conversationMessages.map(msg => ({
-            role: msg.role === "user" ? "user" : "assistant",
+            role: msg.role === 'user' ? 'user' : 'assistant',
             content: msg.content
           }))
         })
@@ -214,12 +214,12 @@ class AnthropicProvider implements AIProvider {
           total: data.usage.input_tokens + data.usage.output_tokens
         },
         confidence: 0.85, // Anthropic doesn't provide confidence scores
-        finishReason: data.stop_reason === "end_turn" ? "stop" : data.stop_reason,
+        finishReason: data.stop_reason === 'end_turn' ? 'stop' : data.stop_reason,
         processingTime,
         provider: this.name
       };
     } catch (error) {
-      logger.error("Anthropic provider error", { error, model: params.model });
+      logger.error('Anthropic provider error', { error, model: params.model });
       throw error;
     }
   }
@@ -257,8 +257,8 @@ export class AIOrchestrator {
     // Inicializar OpenAI
     if (this.config.openaiApiKey) {
       const openaiProvider = new OpenAIProvider(this.config.openaiApiKey);
-      this.providers.set("openai", openaiProvider);
-      this.stats.providerStats.set("openai", {
+      this.providers.set('openai', openaiProvider);
+      this.stats.providerStats.set('openai', {
         requests: 0,
         failures: 0,
         averageTime: 0
@@ -268,15 +268,15 @@ export class AIOrchestrator {
     // Inicializar Anthropic
     if (this.config.anthropicApiKey) {
       const anthropicProvider = new AnthropicProvider(this.config.anthropicApiKey);
-      this.providers.set("anthropic", anthropicProvider);
-      this.stats.providerStats.set("anthropic", {
+      this.providers.set('anthropic', anthropicProvider);
+      this.stats.providerStats.set('anthropic', {
         requests: 0,
         failures: 0,
         averageTime: 0
       });
     }
 
-    logger.info("AI Orchestrator initialized", {
+    logger.info('AI Orchestrator initialized', {
       providers: Array.from(this.providers.keys()),
       defaultModel: this.config.defaultModel
     });
@@ -318,7 +318,7 @@ export class AIOrchestrator {
       this.updateStats(provider.name, Date.now() - startTime, true);
       this.stats.successfulRequests++;
 
-      logger.info("Response generated successfully", {
+      logger.info('Response generated successfully', {
         model,
         provider: provider.name,
         tokens: response.tokens.total,
@@ -329,14 +329,14 @@ export class AIOrchestrator {
 
     } catch (error) {
       this.stats.failedRequests++;
-      logger.error("Failed to generate response", { error });
+      logger.error('Failed to generate response', { error });
       
       // Tentar fallback se habilitado
       if (this.config.enableFallback && this.config.fallbackModel) {
         try {
           return await this.generateFallbackResponse(request);
         } catch (fallbackError) {
-          logger.error("Fallback also failed", { fallbackError });
+          logger.error('Fallback also failed', { fallbackError });
         }
       }
       
@@ -370,7 +370,7 @@ ${assistantConfig.instructions}
 `;
     }
     
-    systemPrompt += `Responda de forma útil, precisa e no estilo especificado. Use o contexto fornecido quando relevante.`;
+    systemPrompt += 'Responda de forma útil, precisa e no estilo especificado. Use o contexto fornecido quando relevante.';
     
     return systemPrompt;
   }
@@ -379,15 +379,15 @@ ${assistantConfig.instructions}
     currentMessage: string,
     conversationHistory: any[],
     systemPrompt: string
-  ): Array<{ role: "user" | "assistant" | "system"; content: string }> {
-    const messages: Array<{ role: "user" | "assistant" | "system"; content: string }> = [
-      { role: "system", content: systemPrompt }
+  ): Array<{ role: 'user' | 'assistant' | 'system'; content: string }> {
+    const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
+      { role: 'system', content: systemPrompt }
     ];
 
     // Adicionar histórico da conversa (últimas 10 mensagens)
     const recentHistory = conversationHistory.slice(-10);
     for (const msg of recentHistory) {
-      if (msg.role === "user" || msg.role === "assistant") {
+      if (msg.role === 'user' || msg.role === 'assistant') {
         messages.push({
           role: msg.role,
           content: msg.content
@@ -397,7 +397,7 @@ ${assistantConfig.instructions}
 
     // Adicionar mensagem atual
     messages.push({
-      role: "user",
+      role: 'user',
       content: currentMessage
     });
 
@@ -407,10 +407,10 @@ ${assistantConfig.instructions}
   private selectProvider(requestedModel: string): { provider: AIProvider; model: string } {
     // Mapear modelos para providers
     const modelToProvider: Record<string, string> = {
-      "gpt-4": "openai",
-      "gpt-3.5-turbo": "openai",
-      "claude-3-sonnet": "anthropic",
-      "claude-3-haiku": "anthropic"
+      'gpt-4': 'openai',
+      'gpt-3.5-turbo': 'openai',
+      'claude-3-sonnet': 'anthropic',
+      'claude-3-haiku': 'anthropic'
     };
 
     const providerName = modelToProvider[requestedModel];
@@ -456,7 +456,7 @@ ${assistantConfig.instructions}
   }
 
   private async generateFallbackResponse(request: any): Promise<AIResponse> {
-    logger.info("Attempting fallback response generation");
+    logger.info('Attempting fallback response generation');
     
     const fallbackModel = this.config.fallbackModel!;
     const { provider, model } = this.selectProvider(fallbackModel);
@@ -536,8 +536,8 @@ export function createAIOrchestrator(config: AIOrchestratorConfig): AIOrchestrat
 // Default configuration
 export function getDefaultAIOrchestratorConfig(): Partial<AIOrchestratorConfig> {
   return {
-    defaultModel: "gpt-4",
-    fallbackModel: "gpt-3.5-turbo",
+    defaultModel: 'gpt-4',
+    fallbackModel: 'gpt-3.5-turbo',
     maxRetries: 3,
     timeout: 30000,
     enableFallback: true

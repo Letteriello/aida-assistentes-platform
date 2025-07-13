@@ -6,6 +6,7 @@
 
 // Re-export database types
 export * from './database'
+export * from './ai'
 
 // Core platform types
 export interface PlatformConfig {
@@ -141,6 +142,13 @@ export interface AIResponse {
     similarity: number
   }[]
   metadata?: Record<string, any>
+  
+  // Additional properties used in the codebase (fixing TS2353 errors)
+  content?: string          // Alias for response
+  confidence?: number       // Alias for confidence_score  
+  should_escalate?: boolean
+  intent?: string
+  entities?: Record<string, any>
 }
 
 // Analytics and monitoring
@@ -279,6 +287,10 @@ export interface CloudflareEnv {
   // R2 Buckets
   MEDIA_BUCKET: R2Bucket
   BACKUP_BUCKET: R2Bucket
+
+  // Missing environment variables (fixing TS2339 errors)
+  EVOLUTION_API_BASE_URL: string
+  WEBHOOK_BASE_URL: string
 }
 
 // Context for dependency injection
@@ -357,6 +369,30 @@ export const INSTANCE_STATUSES: InstanceStatus[] = ['creating', 'connecting', 'c
 export const USER_ROLES: UserRole[] = ['owner', 'admin', 'manager', 'agent']
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = ['free', 'pro', 'enterprise']
 
+// Type alias for backward compatibility (fixing TS2305 errors)
+export type Env = CloudflareEnv
+
+// Missing type aliases for backward compatibility (fixing TS2724 errors)
+export type AssistantCreate = AssistantInsert
+export type ConversationExport = Conversation & { export_format?: 'csv' | 'json' | 'xlsx' }
+export type ConversationFilter = {
+  status?: ConversationStatus[]
+  date_range?: { start: string; end: string }
+  customer_name?: string
+  assistant_id?: string
+}
+
+// RAG Query interface (missing interface causing TS2304 errors)
+export interface RAGQuery {
+  query: string
+  business_id: string
+  max_results?: number
+  include_history?: boolean
+  filters?: Record<string, any>
+  conversation_id?: string
+  assistant_id?: string
+}
+
 // Domain model types derived from database types for better API interfaces
 export interface Assistant {
   id: string
@@ -371,6 +407,17 @@ export interface Assistant {
   updated_at: string
   settings?: Record<string, any>
   performance_metrics?: Record<string, any>
+  
+  // Additional properties used in the codebase (fixing TS2339 errors)
+  system_prompt?: string    // Alias for personality_prompt
+  metrics?: Record<string, any>  // Alias for performance_metrics
+}
+
+// Insert type for Assistant (for database inserts)
+export type AssistantInsert = Omit<Assistant, 'id' | 'created_at' | 'updated_at'> & {
+  id?: string
+  created_at?: string
+  updated_at?: string
 }
 
 export interface Conversation {

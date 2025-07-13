@@ -501,7 +501,7 @@ export class MemoryIntegrator {
             extracted_content: content,
             keywords,
             entities,
-            created_at: new Date()
+            created_at: new Date().toISOString()
           });
       }
 

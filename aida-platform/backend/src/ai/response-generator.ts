@@ -216,8 +216,8 @@ export class AIResponseGenerator {
         content: processedResponse,
         formattedMessages,
         processingTimeMs: processingTime,
-        confidence: processedResponse.confidence,
-        shouldEscalate: processedResponse.should_escalate
+        confidence: processedResponse.confidence || processedResponse.confidence_score || 0,
+        shouldEscalate: processedResponse.should_escalate || false
       },
       metadata: {
         requestId,
@@ -264,8 +264,8 @@ export class AIResponseGenerator {
       );
 
       return {
-        assistant: assistants[0],
-        conversation: conversations[0],
+        assistant: assistants[0]!,
+        conversation: conversations[0]!,
         businessId: request.businessId,
         customerProfile
       };
@@ -331,7 +331,8 @@ export class AIResponseGenerator {
     try {
       // Generate embedding for the incoming message
       await this.config.embeddingService.queueEmbeddingRequest({
-        text: request.message,
+        id: `msg_${Date.now()}`,
+        content: request.message,
         metadata: {
           source: 'message',
           sourceId: request.conversationId,
@@ -371,9 +372,9 @@ export class AIResponseGenerator {
     const processingOptions: ProcessingOptions = {
       includeRAG: true,
       useMemory: true,
-      maxContextLength: context.assistant.settings.max_response_length || 500,
-      confidenceThreshold: context.assistant.settings.confidence_threshold || 0.7,
-      escalationKeywords: context.assistant.settings.escalation_keywords || [],
+      maxContextLength: context.assistant.settings?.max_response_length || 500,
+      confidenceThreshold: context.assistant.settings?.confidence_threshold || 0.7,
+      escalationKeywords: context.assistant.settings?.escalation_keywords || [],
       responseStyle: this.determineResponseStyle(context),
       ...request.processingOptions
     };
@@ -398,7 +399,7 @@ export class AIResponseGenerator {
 
     // Content filtering
     if (this.config.enableContentFilter) {
-      const filterResult = this.filterContent(processedResponse.content);
+      const filterResult = this.filterContent(processedResponse.response || processedResponse.content || '');
       if (!filterResult.isAppropriate) {
         this.responseQuality.contentFiltered++;
         processedResponse = await this.generateFallbackResponse(request, context);
@@ -406,21 +407,23 @@ export class AIResponseGenerator {
     }
 
     // Fact checking (simplified implementation)
-    if (this.config.enableFactChecking && processedResponse.confidence < 0.6) {
-      processedResponse.content += '\n\nPlease verify this information with our team if needed.';
-      processedResponse.confidence = Math.max(processedResponse.confidence, 0.4);
+    if (this.config.enableFactChecking && (processedResponse.confidence || processedResponse.confidence_score || 0) < 0.6) {
+      const responseText = processedResponse.response || processedResponse.content || '';
+      processedResponse.response = responseText + '\n\nPlease verify this information with our team if needed.';
+      processedResponse.confidence_score = Math.max(processedResponse.confidence || processedResponse.confidence_score || 0, 0.4);
     }
 
     // Personalization
     if (this.config.enablePersonalization && context.customerProfile?.name) {
-      processedResponse.content = this.personalizeResponse(
-        processedResponse.content,
+      const responseText = processedResponse.response || processedResponse.content || '';
+      processedResponse.response = this.personalizeResponse(
+        responseText,
         context.customerProfile.name
       );
     }
 
     // Low confidence handling
-    if (processedResponse.confidence < this.config.confidenceThreshold) {
+    if ((processedResponse.confidence || processedResponse.confidence_score || 0) < this.config.confidenceThreshold) {
       this.responseQuality.lowConfidence++;
       processedResponse.should_escalate = true;
     }
@@ -438,7 +441,7 @@ export class AIResponseGenerator {
   ): FormattedMessage[] {
     // Configure formatter based on assistant settings
     this.config.messageFormatter.updateConfig({
-      maxMessageLength: context.assistant.settings.max_response_length || 500,
+      maxMessageLength: context.assistant.settings?.max_response_length || 500,
       businessStyle: this.determineResponseStyle(context),
       enableEmojis: true,
       enableFormatting: true
@@ -460,18 +463,17 @@ export class AIResponseGenerator {
       // Store the assistant's response message
       await this.config.supabase.insert<Message>('messages', {
         conversation_id: request.conversationId,
-        content: response.content,
+        content: response.response || response.content || '',
         sender_type: 'assistant',
         message_type: 'text',
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         metadata: {
-          confidence_score: response.confidence,
+          confidence_score: response.confidence || response.confidence_score,
           intent: response.intent,
           entities: response.entities,
           processing_time_ms: response.processing_time_ms,
           sources: response.sources
         },
-        is_processed: true,
         processing_time_ms: response.processing_time_ms
       });
 
@@ -607,8 +609,8 @@ export class AIResponseGenerator {
     context: ConversationContext
   ): Promise<AIResponse> {
     return {
-      content: 'I apologize, but I need to connect you with one of our team members to better assist you with this request.',
-      confidence: 0.5,
+      response: 'I apologize, but I need to connect you with one of our team members to better assist you with this request.',
+      confidence_score: 0.5,
       sources: [],
       processing_time_ms: 0,
       should_escalate: true,
@@ -632,7 +634,7 @@ export class AIResponseGenerator {
   private createErrorResponse(
     requestId: string,
     request: ResponseRequest,
-    errorType: ResponseResult['error']['type'],
+    errorType: 'processing' | 'timeout' | 'content_filter' | 'rate_limit' | 'unknown',
     message: string,
     startTime: number
   ): ResponseResult {
@@ -677,7 +679,7 @@ export class AIResponseGenerator {
   /**
    * Get response generator statistics
    */
-  getStats(): ResponseStats & { qualityMetrics: typeof this.responseQuality } {
+  getStats(): ResponseStats & { qualityMetrics: { contentFiltered: number; factCheckFailed: number; lowConfidence: number; escalations: number } } {
     return {
       ...this.stats,
       qualityMetrics: { ...this.responseQuality }

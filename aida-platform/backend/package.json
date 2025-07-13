@@ -51,6 +51,7 @@
     "@typescript-eslint/parser": "^8.0.0",
     "@vitest/ui": "^3.2.4",
     "eslint": "^9.0.0",
+    "msw": "^2.10.4",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "vi-fetch": "^0.8.0",
