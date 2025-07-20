@@ -1,0 +1,89 @@
+# Easypanel Configuration for AIDA Platform
+# This file configures the deployment of the AIDA platform on Easypanel
+
+version: '3.8'
+
+services:
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_EVOLUTION_API_URL=${EVOLUTION_API_URL}
+      - NEXT_PUBLIC_APP_URL=${APP_URL}
+    depends_on:
+      - backend
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aida-frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.aida-frontend.tls=true"
+      - "traefik.http.routers.aida-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.aida-frontend.loadbalancer.server.port=3000"
+
+  # Backend (Node.js/Express)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - EVOLUTION_API_URL=${EVOLUTION_API_URL}
+      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - ADMIN_WHATSAPP_INSTANCE=${ADMIN_WHATSAPP_INSTANCE}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - PAGSEGURO_TOKEN=${PAGSEGURO_TOKEN}
+      - PAGSEGURO_EMAIL=${PAGSEGURO_EMAIL}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aida-backend.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.aida-backend.tls=true"
+      - "traefik.http.routers.aida-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.aida-backend.loadbalancer.server.port=8000"
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+volumes:
+  redis_data:
+    driver: local
+
+# Environment variables that need to be set in Easypanel:
+# DOMAIN - Your domain (e.g., aida.exemplo.com)
+# SUPABASE_URL - Your Supabase project URL
+# SUPABASE_ANON_KEY - Your Supabase anonymous key
+# SUPABASE_SERVICE_ROLE_KEY - Your Supabase service role key
+# EVOLUTION_API_URL - Evolution API URL (e.g., https://one-million-evolution-api.xwty7p.easypanel.host)
+# EVOLUTION_API_KEY - Evolution API authentication key
+# OPENAI_API_KEY - OpenAI API key for AI responses
+# JWT_SECRET - Secret for JWT token generation
+# WEBHOOK_SECRET - Secret for webhook validation
+# ADMIN_WHATSAPP_INSTANCE - Admin WhatsApp instance ID for auth codes
+# STRIPE_SECRET_KEY - Stripe secret key (optional)
+# STRIPE_WEBHOOK_SECRET - Stripe webhook secret (optional)
+# PAGSEGURO_TOKEN - PagSeguro API token (optional)
+# PAGSEGURO_EMAIL - PagSeguro account email (optional)
+# APP_URL - Full URL of your application (e.g., https://aida.exemplo.com)

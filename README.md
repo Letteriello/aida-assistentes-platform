@@ -1,16 +1,16 @@
-# AIDA Platform - AI-Powered WhatsApp Assistant Platform
+# AIDA Platform - Plataforma de Assistentes WhatsApp com IA
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow" alt="Status">
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white" alt="Next.js">
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white" alt="Supabase">
-  <img src="https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white" alt="WhatsApp">
-</div>
+Plataforma simplificada para criação e gerenciamento de assistentes de IA no WhatsApp, integrada com Evolution API e sistema de cobrança de R$250/mês por instância.
 
-## 🚀 Visão Geral
+## 🚀 Funcionalidades
 
-A **AIDA Platform** é uma solução completa e escalável para criação e gerenciamento de assistentes de IA integrados ao WhatsApp. Desenvolvida com arquitetura moderna e foco em performance, a plataforma oferece recursos avançados de RAG (Retrieval-Augmented Generation), multi-tenancy e integração nativa com APIs do WhatsApp.
+- **Autenticação via WhatsApp**: Login com código de 6 dígitos enviado via WhatsApp
+- **Conexão WhatsApp**: Integração completa com Evolution API para gerenciar instâncias
+- **Cérebro do Assistente**: Configuração estruturada com engenharia de contexto
+- **Catálogo de Produtos**: Gerenciamento de produtos com busca vetorial
+- **Sistema RAG Híbrido**: Combinação de grafos de conhecimento e busca vetorial
+- **Cobrança Automatizada**: R$250/mês por instância com período de carência de 30 dias
+- **Interface Moderna**: UI responsiva com Tailwind CSS e shadcn/ui
 
 ### ✨ Características Principais
 

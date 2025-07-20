@@ -1,0 +1,230 @@
+/* Custom CSS Classes for AIDA Assistentes */
+
+/* Glass Effects */
+.glass-golden {
+  @apply bg-gradient-to-br from-golden-50/80 to-golden-100/60 backdrop-blur-md border border-golden-200/50 shadow-lg;
+}
+
+/* Shadow Effects */
+.shadow-golden {
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.25), 0 4px 6px -2px rgba(245, 158, 11, 0.1);
+}
+
+.shadow-golden-lg {
+  box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.3), 0 8px 16px -4px rgba(245, 158, 11, 0.15);
+}
+
+.shadow-elegant {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-soft {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-depth {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Border Radius */
+.rounded-liquid {
+  border-radius: 1.5rem;
+}
+
+.rounded-organic {
+  border-radius: 1.25rem;
+}
+
+.rounded-flowing {
+  border-radius: 1rem;
+}
+
+/* Gradient Backgrounds */
+.bg-gradient-golden {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.bg-gradient-glow {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%);
+}
+
+.bg-gradient-flow {
+  background: linear-gradient(135deg, #FCD34D 0%, #FBBF24 50%, #F59E0B 100%);
+}
+
+/* Button Styles */
+.luxury-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.luxury-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.luxury-button:hover::before {
+  left: 100%;
+}
+
+/* Card Styles */
+.luxury-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Animations */
+@keyframes prosperity-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.8), 0 0 30px rgba(245, 158, 11, 0.6);
+  }
+}
+
+@keyframes glow-rotate {
+  0% {
+    transform: rotate(0deg);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
+  }
+  100% {
+    transform: rotate(360deg);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+  }
+}
+
+@keyframes liquid-rise {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes flow {
+  0%, 100% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(10px) scale(1.02);
+  }
+}
+
+/* Animation Classes */
+.animate-prosperity-pulse {
+  animation: prosperity-pulse 2s ease-in-out infinite;
+}
+
+.animate-text-glow {
+  animation: text-glow 2s ease-in-out infinite;
+}
+
+.animate-glow-rotate {
+  animation: glow-rotate 3s linear infinite;
+}
+
+.animate-liquid-rise {
+  animation: liquid-rise 0.6s ease-out;
+}
+
+.animate-flow {
+  animation: flow 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+/* Hover Effects */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+.hover\:scale-110:hover {
+  transform: scale(1.1);
+}
+
+/* Tech Colors (for dark theme compatibility) */
+.tech-slate-800 {
+  background-color: #1e293b;
+}
+
+.tech-zinc-800 {
+  background-color: #27272a;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .glass-golden {
+    @apply backdrop-blur-sm;
+  }
+  
+  .shadow-golden,
+  .shadow-golden-lg,
+  .shadow-elegant {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Dark mode adjustments */
+.dark .glass-golden {
+  @apply bg-gradient-to-br from-golden-900/20 to-golden-800/30 border-golden-700/30;
+}
+
+.dark .shadow-golden {
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4), 0 4px 6px -2px rgba(245, 158, 11, 0.2);
+}
+
+.dark .shadow-elegant {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Performance optimizations */
+.luxury-button,
+.luxury-card,
+.glass-golden {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-prosperity-pulse,
+  .animate-text-glow,
+  .animate-glow-rotate,
+  .animate-liquid-rise,
+  .animate-flow,
+  .animate-shimmer {
+    animation: none;
+  }
+  
+  .luxury-button::before {
+    display: none;
+  }
+}

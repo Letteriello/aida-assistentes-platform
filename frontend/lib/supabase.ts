@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { Database } from '@shared/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -23,7 +23,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // Helper functions for common operations
 export const auth = {
-  signUp: (email: string, password: string, metadata?: Record<string, any>) =>
+  signUp: (email: string, password: string, metadata?: Record<string, unknown>) =>
     supabase.auth.signUp({ email, password, options: { data: metadata } }),
   
   signIn: (email: string, password: string) =>
@@ -35,7 +35,7 @@ export const auth = {
   
   getUser: () => supabase.auth.getUser(),
   
-  onAuthStateChange: (callback: (event: string, session: any) => void) =>
+  onAuthStateChange: (callback: (event: AuthChangeEvent, session: Session | null) => void) =>
     supabase.auth.onAuthStateChange(callback)
 };
 
@@ -135,7 +135,7 @@ export const db = {
 
 // Real-time subscriptions
 export const realtime = {
-  subscribeToConversations: (businessId: string, callback: (payload: any) => void) =>
+  subscribeToConversations: (businessId: string, callback: (payload: unknown) => void) =>
     supabase
       .channel('conversations')
       .on(
@@ -150,7 +150,7 @@ export const realtime = {
       )
       .subscribe(),
   
-  subscribeToMessages: (conversationId: string, callback: (payload: any) => void) =>
+  subscribeToMessages: (conversationId: string, callback: (payload: unknown) => void) =>
     supabase
       .channel('messages')
       .on(

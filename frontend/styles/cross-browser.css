@@ -1,0 +1,439 @@
+/**
+ * AIDA Platform - Cross-Browser Compatibility Styles
+ * Estilos específicos para garantir compatibilidade entre navegadores e dispositivos
+ */
+
+/* ==========================================================================
+   Reset e Normalização Cross-Browser
+   ========================================================================== */
+
+/* Box-sizing universal */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Normalização de elementos HTML5 para IE */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, main, nav, section, summary {
+  display: block;
+}
+
+/* ==========================================================================
+   Suporte a Dispositivos Móveis
+   ========================================================================== */
+
+/* Prevenção de zoom em inputs no iOS */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+textarea,
+select {
+  font-size: 16px; /* Previne zoom no iOS Safari */
+}
+
+/* Suporte ao notch do iPhone X+ */
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Altura da viewport para dispositivos móveis */
+.min-h-screen-mobile {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height */
+}
+
+/* ==========================================================================
+   Otimizações de Touch
+   ========================================================================== */
+
+/* Área de toque mínima recomendada (44px) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Área de toque maior para dispositivos pequenos */
+@media (max-width: 375px) {
+  .touch-target-small {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Feedback visual para touch */
+.touch-feedback {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.95);
+}
+
+/* Desabilita seleção de texto em elementos interativos */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ==========================================================================
+   Compatibilidade com Navegadores
+   ========================================================================== */
+
+/* Backdrop blur fallback */
+.backdrop-blur-fallback {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  .backdrop-blur-fallback {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Flexbox fallbacks para IE11 */
+.flex-ie {
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex-column-ie {
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.flex-center-ie {
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+/* Grid fallback para navegadores antigos */
+.grid-fallback {
+  display: block;
+}
+
+@supports (display: grid) {
+  .grid-fallback {
+    display: grid;
+  }
+}
+
+/* ==========================================================================
+   Otimizações de Performance
+   ========================================================================== */
+
+/* Aceleração de hardware para animações */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Otimização de scroll para iOS */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevenção de scroll bounce no iOS */
+.no-bounce {
+  overscroll-behavior: none;
+}
+
+/* ==========================================================================
+   Acessibilidade
+   ========================================================================== */
+
+/* Respeita preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Melhora contraste para usuários com preferência de alto contraste */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Suporte a modo escuro */
+@media (prefers-color-scheme: dark) {
+  .auto-dark {
+    color-scheme: dark;
+  }
+}
+
+/* ==========================================================================
+   Utilitários Específicos por Dispositivo
+   ========================================================================== */
+
+/* Classes condicionais baseadas no dispositivo */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* Orientação específica */
+@media (orientation: portrait) {
+  .portrait-only {
+    display: block;
+  }
+  
+  .landscape-only {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) {
+  .portrait-only {
+    display: none;
+  }
+  
+  .landscape-only {
+    display: block;
+  }
+}
+
+/* ==========================================================================
+   Correções Específicas por Navegador
+   ========================================================================== */
+
+/* Safari específico */
+@supports (-webkit-appearance: none) {
+  .safari-fix {
+    -webkit-appearance: none;
+  }
+}
+
+/* Firefox específico */
+@-moz-document url-prefix() {
+  .firefox-fix {
+    -moz-appearance: none;
+  }
+}
+
+/* Edge/IE específico */
+@supports (-ms-ime-align: auto) {
+  .edge-fix {
+    -ms-overflow-style: none;
+  }
+}
+
+/* Chrome específico */
+@supports (-webkit-background-clip: text) {
+  .chrome-fix {
+    -webkit-background-clip: text;
+  }
+}
+
+/* ==========================================================================
+   Otimizações de Formulários
+   ========================================================================== */
+
+/* Remove aparência padrão de inputs */
+.input-reset {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* Corrige zoom em inputs no iOS */
+.input-no-zoom {
+  font-size: 16px;
+  transform: scale(1);
+}
+
+/* Estilo consistente para selects */
+.select-custom {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+}
+
+/* ==========================================================================
+   Otimizações de Imagem
+   ========================================================================== */
+
+/* Imagens responsivas */
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Lazy loading nativo */
+.img-lazy {
+  loading: lazy;
+}
+
+/* Otimização para telas de alta densidade */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .retina-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* ==========================================================================
+   Utilitários de Layout
+   ========================================================================== */
+
+/* Container responsivo */
+.container-responsive {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding: 0 2rem;
+  }
+}
+
+/* Grid responsivo */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+  
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  
+  .ir a:after,
+  a[href^="javascript:"]:after,
+  a[href^="#"]:after {
+    content: "";
+  }
+  
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+  
+  img {
+    max-width: 100% !important;
+  }
+  
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}

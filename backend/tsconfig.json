@@ -34,11 +34,11 @@
   "include": [
     "src/**/*",
     "../shared/**/*",
+    "tests/**/*",
     "worker-configuration.d.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "tests/**/*"
+    "dist"
   ]
 }

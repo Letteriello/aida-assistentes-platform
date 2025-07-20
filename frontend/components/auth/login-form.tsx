@@ -1,177 +1,187 @@
 'use client';
 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useState } from 'react';
-import { useAuth } from '@/components/providers';
+import { motion } from 'framer-motion';
+import { useAuthStore } from '@/lib/stores';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AidaCard } from '@/components/aida';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Eye, EyeOff, Key, Shield, Zap } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useToast } from '@/components/ui/use-toast';
+import { Eye, EyeOff, Key, Shield, Loader2, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+
+// Schema de validação com Zod
+const loginSchema = z.object({
+  apiKey: z.string()
+    .min(1, 'A chave de API é obrigatória')
+    .min(10, 'A chave de API deve ter pelo menos 10 caracteres')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'A chave de API contém caracteres inválidos')
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { login } = useAuthStore();
+  const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    if (!apiKey.trim()) {
-      setError('Por favor, insira sua chave API');
-      setIsLoading(false);
-      return;
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      apiKey: ''
     }
+  });
 
+  const { isSubmitting } = form.formState;
+
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const result = await signIn(apiKey.trim());
-      
-      if (!result.success) {
-        setError(result.error || 'Falha na autenticação');
-      }
-    } catch (error) {
-      setError('Erro de conexão. Verifique sua internet.');
-    } finally {
-      setIsLoading(false);
+      await login(data.apiKey, data.apiKey);
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo de volta à plataforma AIDA."});
+    } catch (err) {
+      toast({
+        title: "Erro no login",
+        description: "Chave de API inválida. Verifique e tente novamente.",
+        variant: "destructive"
+      });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="w-full max-w-md space-y-6">
-        {/* Logo and Header */}
-        <div className="text-center space-y-2">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900">AIDA Platform</h1>
-          <p className="text-gray-600">
-            Assistentes de IA para WhatsApp
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-aida-gold-50 to-white p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md space-y-8"
+      >
+        <div className="text-center">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          >
+            <Shield className="mx-auto h-12 w-12 text-amber-600" />
+          </motion.div>
+          <h1 className="mt-6 text-3xl font-bold tracking-tight bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
+            AIDA Platform
+          </h1>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Acesse sua conta para gerenciar seus assistentes.
           </p>
         </div>
 
-        {/* Features Preview */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="space-y-2">
-            <div className="mx-auto w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-green-600" />
-            </div>
-            <p className="text-xs text-gray-600">Resposta Rápida</p>
-          </div>
-          <div className="space-y-2">
-            <div className="mx-auto w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Key className="w-5 h-5 text-blue-600" />
-            </div>
-            <p className="text-xs text-gray-600">Seguro</p>
-          </div>
-          <div className="space-y-2">
-            <div className="mx-auto w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-purple-600" />
-            </div>
-            <p className="text-xs text-gray-600">Multi-tenant</p>
-          </div>
-        </div>
-
-        {/* Login Form */}
-        <Card className="border-0 shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle>Acesse sua conta</CardTitle>
-            <CardDescription>
-              Use sua chave API para entrar na plataforma
+        <AidaCard variant="gold" className="border-0 shadow-xl backdrop-blur-md">
+          <CardHeader className="space-y-1 text-center pb-6">
+            <CardTitle className="text-2xl font-semibold tracking-tight bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
+              Acesse sua conta
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Insira sua chave de API para continuar na plataforma AIDA
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="apiKey">Chave API</Label>
-                <div className="relative">
-                  <Input
-                    id="apiKey"
-                    type={showApiKey ? 'text' : 'password'}
-                    placeholder="aida_live_xxxxxxxxxxxx"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className="pr-10"
-                    disabled={isLoading}
-                  />
+          <CardContent className="space-y-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="apiKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium flex items-center gap-2">
+                        <Key className="h-4 w-4 text-amber-600" />
+                        Chave de API
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type={showApiKey ? 'text' : 'password'}
+                            placeholder="Insira sua chave de API"
+                            className="pr-10 border-amber-200/50 focus:border-amber-500 focus:ring-amber-500/20 transition-all duration-300"
+                            disabled={isSubmitting}
+                          />
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            type="button"
+                            onClick={() => setShowApiKey(!showApiKey)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            disabled={isSubmitting}
+                          >
+                            {showApiKey ? (
+                              <EyeOff className="h-4 w-4 text-muted-foreground hover:text-amber-600 transition-colors" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-muted-foreground hover:text-amber-600 transition-colors" />
+                            )}
+                          </motion.button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-1 top-1 h-7 w-7 p-0"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    disabled={isLoading}
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-medium py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isSubmitting}
                   >
-                    {showApiKey ? (
-                      <EyeOff className="h-4 w-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Entrar na AIDA
+                      </>
                     )}
                   </Button>
-                </div>
-                <p className="text-xs text-gray-500">
-                  Formato: aida_live_xxx ou aida_test_xxx
-                </p>
+                </motion.div>
+              </form>
+            </Form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-muted-foreground/20" />
               </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <LoadingSpinner className="mr-2 h-4 w-4" />
-                    Entrando...
-                  </>
-                ) : (
-                  'Entrar'
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Help Section */}
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-2">
-              <h3 className="font-medium text-gray-900">Não tem uma conta?</h3>
-              <p className="text-sm text-gray-600">
-                Registre sua empresa e receba suas chaves API
-              </p>
-              <Button
-                variant="outline"
-                className="mt-2"
-                onClick={() => {
-                  // This would open a registration modal or navigate to registration
-                  alert('Funcionalidade de registro será implementada em breve');
-                }}
-              >
-                Registrar Empresa
-              </Button>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">ou</span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Footer */}
-        <div className="text-center text-xs text-gray-500">
-          <p>
-            Ambiente seguro • Dados criptografados • Conformidade LGPD
-          </p>
-        </div>
-      </div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
+            >
+              <p className="text-sm text-muted-foreground">
+                Não tem uma conta?{' '}
+                <Link
+                  href="/register"
+                  className="font-medium text-amber-600 hover:text-amber-700 hover:underline transition-colors"
+                >
+                  Registre-se agora
+                </Link>
+              </p>
+            </motion.div>
+          </CardContent>
+        </AidaCard>
+      </motion.div>
     </div>
   );
 }

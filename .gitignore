@@ -1,3 +1,9 @@
+# =============================================================================
+# AIDA PLATFORM - COMPREHENSIVE GITIGNORE
+# =============================================================================
+# SECURITY: Protects sensitive information from being committed
+# PERFORMANCE: Excludes build artifacts and dependencies
+
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -5,6 +11,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Runtime data
 pids
@@ -62,12 +71,45 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
+# =============================================================================
+# ENVIRONMENT VARIABLES & SECRETS (CRITICAL SECURITY)
+# =============================================================================
+# All environment files containing sensitive data
 .env
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 .env.local
+.env.development
+.env.development.local
+.env.staging
+.env.staging.local
+.env.production
+.env.production.local
+.env.test
+.env.test.local
+
+# API Keys and Secrets
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+keys/
+api-keys.json
+config/secrets.json
+
+# Evolution API specific
+evolution-api-config.json
+whatsapp-instances.json
+
+# Supabase local config
+supabase/.env
+supabase/config.toml
+
+# Cloudflare Workers secrets
+.dev.vars
+wrangler.toml.local
+.wrangler/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -150,14 +192,23 @@ temp/
 *.sqlite
 *.sqlite3
 
-# Secrets and keys
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-secrets/
-keys/
+# =============================================================================
+# CLOUDFLARE WORKERS & DEPLOYMENT
+# =============================================================================
+# Cloudflare Workers
+.wrangler/
+wrangler.toml.backup
+wrangler.toml.local
+.dev.vars
+worker-configuration.d.ts
+
+# Deployment configs with secrets
+docker-compose.override.yml
+kubernetes/secrets/
+helm/values-*.yaml
+terraform.tfvars
+terraform.tfstate*
+.terraform/
 
 # Backup files
 *.backup

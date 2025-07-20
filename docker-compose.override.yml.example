@@ -1,0 +1,47 @@
+# =============================================================================
+# DOCKER COMPOSE OVERRIDE EXAMPLE
+# =============================================================================
+# Copy this file to docker-compose.override.yml and fill with your values
+# This file contains sensitive information and should NOT be committed to Git
+
+version: '3.8'
+
+services:
+  neo4j:
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+
+  backend:
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/aida_platform
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NEO4J_URL=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+
+  postgres:
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=aida_platform
+      - POSTGRES_USER=postgres
+
+# =============================================================================
+# REQUIRED ENVIRONMENT VARIABLES
+# =============================================================================
+# Create a .env file in the root directory with these variables:
+#
+# NEO4J_PASSWORD=your_secure_neo4j_password
+# POSTGRES_PASSWORD=your_secure_postgres_password
+# JWT_PRIVATE_KEY=your_jwt_private_key
+# SUPABASE_URL=your_supabase_url
+# SUPABASE_ANON_KEY=your_supabase_anon_key
+# SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
