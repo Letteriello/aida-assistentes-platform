@@ -1,0 +1,30 @@
+# Configuração de compatibilidade de navegadores para AIDA Platform
+# Esta configuração garante suporte amplo para dispositivos móveis e desktop
+
+# Navegadores modernos (últimas 2 versões)
+last 2 versions
+
+# Navegadores com mais de 1% de uso global
+> 1%
+
+# Navegadores ainda mantidos (recebem atualizações de segurança)
+not dead
+
+# Suporte específico para navegadores móveis
+iOS >= 12
+Android >= 8
+
+# Suporte para navegadores desktop populares
+Chrome >= 88
+Firefox >= 85
+Safari >= 14
+Edge >= 88
+
+# Suporte limitado para Internet Explorer (apenas funcionalidades básicas)
+IE 11
+
+# Exclusões para navegadores muito antigos ou descontinuados
+not IE <= 10
+not op_mini all
+not dead
+not < 0.25%
