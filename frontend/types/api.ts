@@ -22,14 +22,14 @@ export interface ApiError {
   details?: Record<string, any>;
 }
 
-// Estados de requisição
+// Estados de requisicao
 export interface RequestState<T = any> {
   data: T | null;
   loading: boolean;
   error: string | null;
 }
 
-// Tipos para autenticação
+// Tipos para autenticacao
 export interface AuthTokens {
   access_token: string;
   refresh_token: string;

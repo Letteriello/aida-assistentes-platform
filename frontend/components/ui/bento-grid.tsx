@@ -93,7 +93,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
   )
 }
 
-// Componentes pré-configurados para casos comuns
+// Componentes pre-configurados para casos comuns
 export const BentoStatCard: React.FC<{
   title: string
   value: string | number

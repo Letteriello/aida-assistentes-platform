@@ -13,7 +13,7 @@ export interface Assistant {
   createdAt: string;
   updatedAt: string;
   
-  // Configurações
+  // Configuracoes
   settings: {
     welcomeMessage: string;
     fallbackMessage: string;
@@ -29,7 +29,7 @@ export interface Assistant {
     };
   };
   
-  // Estatísticas
+  // Estatisticas
   stats: {
     totalConversations: number;
     totalMessages: number;
@@ -71,7 +71,7 @@ export interface AssistantsState {
   statusFilter: Assistant['status'] | 'all';
   typeFilter: Assistant['type'] | 'all';
   
-  // Paginação
+  // Paginacao
   currentPage: number;
   itemsPerPage: number;
   totalItems: number;
@@ -92,7 +92,7 @@ export interface AssistantsActions {
   loadTemplates: () => Promise<void>;
   createFromTemplate: (templateId: string, customData?: Partial<Assistant>) => Promise<void>;
   
-  // Seleção
+  // Selecao
   selectAssistant: (assistant: Assistant | null) => void;
   
   // Filtros e busca
@@ -101,15 +101,15 @@ export interface AssistantsActions {
   setTypeFilter: (type: Assistant['type'] | 'all') => void;
   clearFilters: () => void;
   
-  // Paginação
+  // Paginacao
   setCurrentPage: (page: number) => void;
   setItemsPerPage: (items: number) => void;
   
-  // Ações específicas
+  // Acoes especificas
   toggleAssistantStatus: (id: string) => Promise<void>;
   updateAssistantSettings: (id: string, settings: Partial<Assistant['settings']>) => Promise<void>;
   
-  // Utilitários
+  // Utilitarios
   getAssistantById: (id: string) => Assistant | undefined;
   getFilteredAssistants: () => Assistant[];
   clearError: () => void;
@@ -118,7 +118,7 @@ export interface AssistantsActions {
 
 type AssistantsStore = AssistantsState & AssistantsActions;
 
-// Templates padrão
+// Templates padrao
 const defaultTemplates: AssistantTemplate[] = [
   {
     id: 'customer-service',
@@ -126,8 +126,8 @@ const defaultTemplates: AssistantTemplate[] = [
     description: 'Assistente especializado em atendimento e suporte ao cliente',
     type: 'customer_service',
     defaultSettings: {
-      welcomeMessage: 'Olá! Como posso ajudá-lo hoje?',
-      fallbackMessage: 'Desculpe, não entendi. Pode reformular sua pergunta?',
+      welcomeMessage: 'Ola! Como posso ajuda-lo hoje?',
+      fallbackMessage: 'Desculpe, nao entendi. Pode reformular sua pergunta?',
       maxTokens: 150,
       temperature: 0.7,
       responseTime: 2000,
@@ -140,19 +140,19 @@ const defaultTemplates: AssistantTemplate[] = [
       },
     },
     prompts: {
-      system: 'Você é um assistente de atendimento ao cliente profissional e prestativo.',
-      welcome: 'Olá! Como posso ajudá-lo hoje?',
-      fallback: 'Desculpe, não entendi. Pode reformular sua pergunta?',
+      system: 'Voce e um assistente de atendimento ao cliente profissional e prestativo.',
+      welcome: 'Ola! Como posso ajuda-lo hoje?',
+      fallback: 'Desculpe, nao entendi. Pode reformular sua pergunta?',
     },
   },
   {
     id: 'sales',
     name: 'Vendas',
-    description: 'Assistente focado em vendas e conversão de leads',
+    description: 'Assistente focado em vendas e conversao de leads',
     type: 'sales',
     defaultSettings: {
-      welcomeMessage: 'Olá! Estou aqui para ajudá-lo a encontrar a solução perfeita!',
-      fallbackMessage: 'Posso esclarecer melhor sobre nossos produtos e serviços.',
+      welcomeMessage: 'Ola! Estou aqui para ajuda-lo a encontrar a solucao perfeita!',
+      fallbackMessage: 'Posso esclarecer melhor sobre nossos produtos e servicos.',
       maxTokens: 200,
       temperature: 0.8,
       responseTime: 1500,
@@ -165,9 +165,9 @@ const defaultTemplates: AssistantTemplate[] = [
       },
     },
     prompts: {
-      system: 'Você é um assistente de vendas persuasivo e conhecedor dos produtos.',
-      welcome: 'Olá! Estou aqui para ajudá-lo a encontrar a solução perfeita!',
-      fallback: 'Posso esclarecer melhor sobre nossos produtos e serviços.',
+      system: 'Voce e um assistente de vendas persuasivo e conhecedor dos produtos.',
+      welcome: 'Ola! Estou aqui para ajuda-lo a encontrar a solucao perfeita!',
+      fallback: 'Posso esclarecer melhor sobre nossos produtos e servicos.',
     },
   },
 ];
@@ -322,7 +322,7 @@ export const useAssistantsStore = create<AssistantsStore>()(
         
         const duplicateData = {
           ...assistant,
-          name: `${assistant.name} (Cópia)`,
+          name: `${assistant.name} (Copia)`,
           status: 'inactive' as const,
         };
         
@@ -344,8 +344,8 @@ export const useAssistantsStore = create<AssistantsStore>()(
             set({ templates });
           }
         } catch (error) {
-          // Usar templates padrão em caso de erro
-          console.warn('Falha ao carregar templates, usando padrões');
+          // Usar templates padrao em caso de erro
+          console.warn('Falha ao carregar templates, usando padroes');
         }
       },
 
@@ -353,7 +353,7 @@ export const useAssistantsStore = create<AssistantsStore>()(
       createFromTemplate: async (templateId, customData = {}) => {
         const template = get().templates.find(t => t.id === templateId);
         if (!template) {
-          throw new Error('Template não encontrado');
+          throw new Error('Template nao encontrado');
         }
         
         const assistantData = {
@@ -369,7 +369,7 @@ export const useAssistantsStore = create<AssistantsStore>()(
         await get().createAssistant(assistantData);
       },
 
-      // Seleção
+      // Selecao
       selectAssistant: (assistant) => {
         set({ selectedAssistant: assistant });
       },
@@ -405,7 +405,7 @@ export const useAssistantsStore = create<AssistantsStore>()(
         set({ itemsPerPage, currentPage: 1 });
       },
 
-      // Ações específicas
+      // Acoes especificas
       toggleAssistantStatus: async (id) => {
         const assistant = get().getAssistantById(id);
         if (!assistant) return;
@@ -422,7 +422,7 @@ export const useAssistantsStore = create<AssistantsStore>()(
         await get().updateAssistant(id, { settings: updatedSettings });
       },
 
-      // Utilitários
+      // Utilitarios
       getAssistantById: (id) => {
         return get().assistants.find(assistant => assistant.id === id);
       },
@@ -453,7 +453,7 @@ export const useAssistantsStore = create<AssistantsStore>()(
     {
       name: 'aida-assistants-storage',
       storage: createJSONStorage(() => localStorage),
-      // Persistir apenas filtros e configurações
+      // Persistir apenas filtros e configuracoes
       partialize: (state) => ({
         itemsPerPage: state.itemsPerPage,
         statusFilter: state.statusFilter,

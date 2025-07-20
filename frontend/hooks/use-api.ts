@@ -1,12 +1,12 @@
-// Hook base para requisições de API usando React Query
+// Hook base para requisicoes de API usando React Query
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ApiResponse, ApiError } from '@/types';
 
-// Configuração base para o cliente de API
+// Configuracao base para o cliente de API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
-// Função utilitária para fazer requisições
+// Funcao utilitaria para fazer requisicoes
 export const apiClient = {
   get: async <T>(endpoint: string): Promise<T> => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -18,7 +18,7 @@ export const apiClient = {
     
     if (!response.ok) {
       const error: ApiError = await response.json();
-      throw new Error(error.message || 'Erro na requisição');
+      throw new Error(error.message || 'Erro na requisicao');
     }
     
     return response.json();
@@ -75,7 +75,7 @@ export const apiClient = {
   },
 };
 
-// Hook genérico para queries
+// Hook generico para queries
 export function useApiQuery<T>(
   key: string[],
   endpoint: string,
@@ -90,12 +90,12 @@ export function useApiQuery<T>(
     queryFn: () => apiClient.get<ApiResponse<T>>(endpoint),
     enabled: options?.enabled,
     refetchInterval: options?.refetchInterval,
-    staleTime: options?.staleTime || 5 * 60 * 1000, // 5 minutos por padrão
+    staleTime: options?.staleTime || 5 * 60 * 1000, // 5 minutos por padrao
     select: (data) => data.data, // Extrai apenas os dados da resposta
   });
 }
 
-// Hook genérico para mutations
+// Hook generico para mutations
 export function useApiMutation<TData, TVariables = any>(
   endpoint: string,
   method: 'POST' | 'PUT' | 'DELETE' = 'POST',
@@ -117,7 +117,7 @@ export function useApiMutation<TData, TVariables = any>(
         case 'DELETE':
           return apiClient.delete<ApiResponse<TData>>(endpoint);
         default:
-          throw new Error(`Método ${method} não suportado`);
+          throw new Error(`Metodo ${method} nao suportado`);
       }
     },
     onSuccess: (data) => {

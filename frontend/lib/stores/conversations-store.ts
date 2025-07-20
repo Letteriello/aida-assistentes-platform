@@ -81,7 +81,7 @@ export interface ConversationsState {
   // Filtros e busca
   filter: ConversationFilter;
   
-  // Paginação
+  // Paginacao
   currentPage: number;
   itemsPerPage: number;
   totalItems: number;
@@ -110,7 +110,7 @@ export interface ConversationsActions {
   sendMessage: (conversationId: string, content: string, type?: Message['type']) => Promise<void>;
   markAsRead: (conversationId: string) => Promise<void>;
   
-  // Seleção
+  // Selecao
   selectConversation: (conversation: Conversation | null) => void;
   
   // Filtros
@@ -125,13 +125,13 @@ export interface ConversationsActions {
   setSidebarOpen: (open: boolean) => void;
   setTyping: (conversationId: string, isTyping: boolean) => void;
   
-  // Ações específicas
+  // Acoes especificas
   assignToAssistant: (conversationId: string, assistantId: string) => Promise<void>;
   addTag: (conversationId: string, tag: string) => Promise<void>;
   removeTag: (conversationId: string, tag: string) => Promise<void>;
   setPriority: (conversationId: string, priority: Conversation['priority']) => Promise<void>;
   
-  // Utilitários
+  // Utilitarios
   getConversationById: (id: string) => Conversation | undefined;
   getFilteredConversations: () => Conversation[];
   getUnreadCount: () => number;
@@ -520,7 +520,7 @@ export const useConversationsStore = create<ConversationsStore>()(
     {
       name: 'aida-conversations-storage',
       storage: createJSONStorage(() => localStorage),
-      // Persistir apenas configurações de UI
+      // Persistir apenas configuracoes de UI
       partialize: (state) => ({
         itemsPerPage: state.itemsPerPage,
         sidebarOpen: state.sidebarOpen,

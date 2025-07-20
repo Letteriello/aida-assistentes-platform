@@ -1,6 +1,6 @@
 /**
  * AIDA Platform - Authentication System
- * Sistema de autenticação de usuário com email/senha e gerenciamento de sessão via Supabase/JWT.
+ * Sistema de autenticacao de usuario com email/senha e gerenciamento de sessao via Supabase/JWT.
  * PATTERN: Context-based auth with JWT for user sessions.
  */
 
@@ -140,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Don't auto-login, just show success and let them log in.
         setState(prev => ({ ...prev, isLoading: false }));
 
-        toast.success('Registro realizado com sucesso! Faça o login para continuar.');
+        toast.success('Registro realizado com sucesso! Faca o login para continuar.');
         // Optionally, you could auto-login here by setting state and token
       }
     } catch (error: any) {
@@ -162,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
       isAuthenticated: false
     });
-    toast.info('Você foi desconectado.');
+    toast.info('Voce foi desconectado.');
   };
 
   const refreshAuth = async () => {

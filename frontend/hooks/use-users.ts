@@ -1,9 +1,9 @@
-// Hooks específicos para operações com usuários
+// Hooks especificos para operacoes com usuarios
 
 import { useApiQuery, useApiMutation } from './use-api';
 import { User, RegisterData, RegisterResponse, LoginCredentials } from '@/types';
 
-// Hook para buscar usuários
+// Hook para buscar usuarios
 export function useUsers(options?: { enabled?: boolean }) {
   return useApiQuery<User[]>(
     ['users'],
@@ -15,7 +15,7 @@ export function useUsers(options?: { enabled?: boolean }) {
   );
 }
 
-// Hook para buscar um usuário específico
+// Hook para buscar um usuario especifico
 export function useUser(userId: string, options?: { enabled?: boolean }) {
   return useApiQuery<User>(
     ['users', userId],
@@ -26,7 +26,7 @@ export function useUser(userId: string, options?: { enabled?: boolean }) {
   );
 }
 
-// Hook para buscar o usuário atual
+// Hook para buscar o usuario atual
 export function useCurrentUser() {
   return useApiQuery<User>(
     ['users', 'current'],
@@ -37,17 +37,17 @@ export function useCurrentUser() {
   );
 }
 
-// Hook para registrar novo usuário
+// Hook para registrar novo usuario
 export function useRegisterUser() {
   return useApiMutation<RegisterResponse, RegisterData>(
     '/register',
     'POST',
     {
       onSuccess: (data) => {
-        console.log('Usuário registrado com sucesso:', data);
+        console.log('Usuario registrado com sucesso:', data);
       },
       onError: (error) => {
-        console.error('Erro ao registrar usuário:', error.message);
+        console.error('Erro ao registrar usuario:', error.message);
       },
     }
   );
@@ -85,14 +85,14 @@ export function useLogout() {
   );
 }
 
-// Hook para atualizar usuário
+// Hook para atualizar usuario
 export function useUpdateUser(userId: string) {
   return useApiMutation<User, Partial<User>>(
     `/users/${userId}`,
     'PUT',
     {
       onSuccess: () => {
-        console.log('Usuário atualizado com sucesso');
+        console.log('Usuario atualizado com sucesso');
       },
       invalidateQueries: [
         ['users'],
@@ -103,28 +103,28 @@ export function useUpdateUser(userId: string) {
   );
 }
 
-// Hook para deletar usuário
+// Hook para deletar usuario
 export function useDeleteUser() {
   return useApiMutation<void, string>(
     '/users',
     'DELETE',
     {
       onSuccess: () => {
-        console.log('Usuário deletado com sucesso');
+        console.log('Usuario deletado com sucesso');
       },
       invalidateQueries: [['users']],
     }
   );
 }
 
-// Hook para atualizar preferências do usuário
+// Hook para atualizar preferencias do usuario
 export function useUpdateUserPreferences(userId: string) {
   return useApiMutation<User, Partial<User['preferences']>>(
     `/users/${userId}/preferences`,
     'PUT',
     {
       onSuccess: () => {
-        console.log('Preferências atualizadas com sucesso');
+        console.log('Preferencias atualizadas com sucesso');
       },
       invalidateQueries: [
         ['users', userId],

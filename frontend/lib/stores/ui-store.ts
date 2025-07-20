@@ -33,7 +33,7 @@ export interface UIState {
   // Modais
   modals: Modal[];
   
-  // Notificações
+  // Notificacoes
   notifications: Notification[];
   
   // Sidebar
@@ -58,7 +58,7 @@ export interface UIActions {
   closeModal: (id: string) => void;
   closeAllModals: () => void;
   
-  // Notificações
+  // Notificacoes
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => string;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
@@ -135,7 +135,7 @@ export const useUIStore = create<UIStore>()(
           ),
         }));
         
-        // Remove modal após animação
+        // Remove modal apos animacao
         setTimeout(() => {
           set((state) => ({
             modals: state.modals.filter((modal) => modal.id !== id),
@@ -167,7 +167,7 @@ export const useUIStore = create<UIStore>()(
           notifications: [...state.notifications, notification],
         }));
         
-        // Auto-remove após duração especificada
+        // Auto-remove apos duracao especificada
         if (notification.duration && notification.duration > 0) {
           setTimeout(() => {
             get().removeNotification(id);

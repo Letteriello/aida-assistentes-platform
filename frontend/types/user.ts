@@ -1,4 +1,4 @@
-// Tipos relacionados a usuários e perfis
+// Tipos relacionados a usuarios e perfis
 
 export interface User {
   id: string;

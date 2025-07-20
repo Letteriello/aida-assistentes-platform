@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import type { ValidatorFunction } from "@/lib/validation-utils"
 
-// Tipos para o sistema de validação
+// Tipos para o sistema de validacao
 export interface CampoValidacao {
   valor: string
   erro?: string
@@ -79,7 +79,7 @@ export function useFormValidation(
       }
     }))
     
-    // Validação em tempo real se configurada
+    // Validacao em tempo real se configurada
     const config = configuracao[nomeCampo]
     if (config?.modoValidacao === "onChange") {
       // Limpar timeout anterior
@@ -112,7 +112,7 @@ export function useFormValidation(
     }
   }, [configuracao])
   
-  // Validar um campo específico
+  // Validar um campo especifico
   const validarCampo = useCallback(async (nomeCampo: string): Promise<boolean> => {
     const config = configuracao[nomeCampo]
     const campo = campos[nomeCampo]
@@ -131,17 +131,17 @@ export function useFormValidation(
     let erro: string | undefined
     
     try {
-      // Validação síncrona
+      // Validacao sincrona
       if (config.validador) {
         erro = config.validador(campo.valor)
       }
       
-      // Validação assíncrona (apenas se passou na síncrona)
+      // Validacao assincrona (apenas se passou na sincrona)
       if (!erro && config.validacaoAssincrona) {
         erro = await config.validacaoAssincrona(campo.valor)
       }
     } catch (e) {
-      erro = "Erro na validação"
+      erro = "Erro na validacao"
     }
     
     // Atualizar estado
@@ -157,7 +157,7 @@ export function useFormValidation(
     return !erro
   }, [configuracao, campos])
   
-  // Validar todo o formulário
+  // Validar todo o formulario
   const validarFormulario = useCallback(async (): Promise<boolean> => {
     const nomesCampos = Object.keys(configuracao)
     const resultados = await Promise.all(
@@ -191,7 +191,7 @@ export function useFormValidation(
     }
   }, [])
   
-  // Resetar formulário
+  // Resetar formulario
   const resetarFormulario = useCallback(() => {
     setCampos(prev => {
       const novoEstado = { ...prev }
