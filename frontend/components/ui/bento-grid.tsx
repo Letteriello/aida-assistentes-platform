@@ -121,9 +121,9 @@ export const BentoStatCard: React.FC<{
         </div>
         {trend && (
           <div className={cn("text-xs font-medium", trendColors[trend])}>
-            {trend === 'up' && '↗'}
-            {trend === 'down' && '↘'}
-            {trend === 'neutral' && '→'}
+            {trend === 'up' && '↑'}
+              {trend === 'down' && '↓'}
+              {trend === 'neutral' && '→'}
           </div>
         )}
       </div>

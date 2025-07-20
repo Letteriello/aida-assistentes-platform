@@ -284,6 +284,32 @@ module.exports = {
   				'900': 'oklch(var(--tech-dark-900))',
   				DEFAULT: 'oklch(var(--tech-dark-800))'
   			},
+  			'origin-indigo': {
+  				'50': 'oklch(var(--origin-indigo-50))',
+  				'100': 'oklch(var(--origin-indigo-100))',
+  				'200': 'oklch(var(--origin-indigo-200))',
+  				'300': 'oklch(var(--origin-indigo-300))',
+  				'400': 'oklch(var(--origin-indigo-400))',
+  				'500': 'oklch(var(--origin-indigo-500))',
+  				'600': 'oklch(var(--origin-indigo-600))',
+  				'700': 'oklch(var(--origin-indigo-700))',
+  				'800': 'oklch(var(--origin-indigo-800))',
+  				'900': 'oklch(var(--origin-indigo-900))',
+  				DEFAULT: 'oklch(var(--origin-indigo-500))'
+  			},
+  			'origin-gray': {
+  				'50': 'oklch(var(--origin-gray-50))',
+  				'100': 'oklch(var(--origin-gray-100))',
+  				'200': 'oklch(var(--origin-gray-200))',
+  				'300': 'oklch(var(--origin-gray-300))',
+  				'400': 'oklch(var(--origin-gray-400))',
+  				'500': 'oklch(var(--origin-gray-500))',
+  				'600': 'oklch(var(--origin-gray-600))',
+  				'700': 'oklch(var(--origin-gray-700))',
+  				'800': 'oklch(var(--origin-gray-800))',
+  				'900': 'oklch(var(--origin-gray-900))',
+  				DEFAULT: 'oklch(var(--origin-gray-500))'
+  			},
   			chart: {
   				'1': 'oklch(var(--chart-1))',
   				'2': 'oklch(var(--chart-2))',

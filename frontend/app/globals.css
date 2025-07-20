@@ -131,7 +131,32 @@ select {
     --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.25);
     --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.05);
     
-    /* === AIDA PREMIUM COLOR SYSTEM === */
+    /* === ORIGIN UI COLOR PALETTE === */
+    /* Origin UI's signature color scheme with indigo as primary */
+    --origin-indigo-50: oklch(0.97 0.013 272);
+    --origin-indigo-100: oklch(0.93 0.026 272);
+    --origin-indigo-200: oklch(0.86 0.052 272);
+    --origin-indigo-300: oklch(0.76 0.078 272);
+    --origin-indigo-400: oklch(0.64 0.104 272);
+    --origin-indigo-500: oklch(0.52 0.13 272);  /* Primary Origin UI color */
+    --origin-indigo-600: oklch(0.42 0.156 272);
+    --origin-indigo-700: oklch(0.32 0.182 272);
+    --origin-indigo-800: oklch(0.22 0.208 272);
+    --origin-indigo-900: oklch(0.12 0.234 272);
+
+    /* Origin UI's neutral grays */
+    --origin-gray-50: oklch(0.98 0.002 272);
+    --origin-gray-100: oklch(0.95 0.004 272);
+    --origin-gray-200: oklch(0.90 0.008 272);
+    --origin-gray-300: oklch(0.83 0.012 272);
+    --origin-gray-400: oklch(0.68 0.016 272);
+    --origin-gray-500: oklch(0.53 0.02 272);
+    --origin-gray-600: oklch(0.43 0.024 272);
+    --origin-gray-700: oklch(0.33 0.028 272);
+    --origin-gray-800: oklch(0.23 0.032 272);
+    --origin-gray-900: oklch(0.13 0.036 272);
+
+    /* === AIDA PREMIUM COLOR SYSTEM (mantido para compatibilidade) === */
     --aida-primary: 99 102 241;
     --aida-secondary: 139 92 246;
     --aida-accent: 6 182 212;
@@ -139,27 +164,27 @@ select {
     --aida-warning: 245 158 11;
     --aida-error: 239 68 68;
     
-    /* === AIDA TECH UI VARIABLES === */
-    --radius: 0.5rem; /* 8px rounded borders */
-    --background: oklch(0.98 0.002 240);
-    --foreground: var(--tech-dark-900);
+    /* === ORIGIN UI DESIGN TOKENS === */
+    --radius: 0.5rem; /* Origin UI's default border radius */
+    --background: var(--origin-gray-50);
+    --foreground: var(--origin-gray-900);
     --card: oklch(1 0 0);
-    --card-foreground: var(--tech-dark-800);
+    --card-foreground: var(--origin-gray-800);
     --popover: oklch(1 0 0);
-    --popover-foreground: var(--tech-dark-800);
-    --primary: var(--tech-blue-500);
+    --popover-foreground: var(--origin-gray-800);
+    --primary: var(--origin-indigo-500);
     --primary-foreground: oklch(1 0 0);
-    --secondary: var(--tech-dark-100);
-    --secondary-foreground: var(--tech-dark-800);
-    --muted: var(--tech-dark-50);
-    --muted-foreground: var(--tech-dark-600);
-    --accent: var(--tech-blue-100);
-    --accent-foreground: var(--tech-blue-700);
-    --destructive: var(--aida-error);
+    --secondary: var(--origin-gray-100);
+    --secondary-foreground: var(--origin-gray-800);
+    --muted: var(--origin-gray-100);
+    --muted-foreground: var(--origin-gray-600);
+    --accent: var(--origin-gray-100);
+    --accent-foreground: var(--origin-gray-900);
+    --destructive: oklch(0.6 0.2 20); /* Red for errors */
     --destructive-foreground: oklch(1 0 0);
-    --border: var(--tech-dark-200);
-    --input: var(--tech-dark-100);
-    --ring: var(--tech-blue-500);
+    --border: var(--origin-gray-200);
+    --input: var(--origin-gray-100);
+    --ring: var(--origin-indigo-500);
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -265,26 +290,26 @@ select {
   }
 
   .dark {
-    /* === AIDA TECH DARK MODE === */
-    --background: var(--tech-dark-900);
-    --foreground: oklch(0.98 0.002 240);
-    --card: var(--tech-dark-800);
-    --card-foreground: oklch(0.95 0.002 240);
-    --popover: var(--tech-dark-800);
-    --popover-foreground: oklch(0.95 0.002 240);
-    --primary: var(--tech-blue-500);
+    /* === ORIGIN UI DARK MODE === */
+    --background: var(--origin-gray-900);
+    --foreground: var(--origin-gray-50);
+    --card: var(--origin-gray-800);
+    --card-foreground: var(--origin-gray-100);
+    --popover: var(--origin-gray-800);
+    --popover-foreground: var(--origin-gray-100);
+    --primary: var(--origin-indigo-500);
     --primary-foreground: oklch(1 0 0);
-    --secondary: var(--tech-dark-700);
-    --secondary-foreground: oklch(0.95 0.002 240);
-    --muted: var(--tech-dark-800);
-    --muted-foreground: var(--tech-dark-400);
-    --accent: var(--tech-dark-700);
-    --accent-foreground: var(--tech-blue-400);
-    --destructive: var(--aida-error);
+    --secondary: var(--origin-gray-800);
+    --secondary-foreground: var(--origin-gray-100);
+    --muted: var(--origin-gray-800);
+    --muted-foreground: var(--origin-gray-400);
+    --accent: var(--origin-gray-800);
+    --accent-foreground: var(--origin-gray-100);
+    --destructive: oklch(0.6 0.2 20);
     --destructive-foreground: oklch(1 0 0);
-    --border: var(--tech-dark-700);
-    --input: var(--tech-dark-700);
-    --ring: var(--tech-blue-500);
+    --border: var(--origin-gray-700);
+    --input: var(--origin-gray-800);
+    --ring: var(--origin-indigo-500);
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
@@ -676,21 +701,53 @@ select {
     @apply bg-aida-warning;
   }
   
-  /* === ORIGIN UI PREMIUM UTILITIES === */
-  .origin-button-aida {
-    @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300;
+  /* === ORIGIN UI COLOR UTILITIES === */
+  .bg-origin-indigo {
+    background-color: oklch(var(--origin-indigo-500));
   }
   
-  .origin-button-premium {
-    @apply bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 shadow-lg;
+  .text-origin-indigo {
+    color: oklch(var(--origin-indigo-500));
   }
   
-  .origin-card-premium {
-    @apply bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300;
+  .border-origin-indigo {
+    border-color: oklch(var(--origin-indigo-500));
   }
   
-  .dark .origin-card-premium {
-    @apply bg-gray-900/95 border-gray-700/50;
+  .ring-origin-indigo {
+    --tw-ring-color: oklch(var(--origin-indigo-500));
+  }
+  
+  /* Origin UI Button Variants */
+  .origin-button-primary {
+    @apply bg-[oklch(var(--origin-indigo-500))] text-white hover:bg-[oklch(var(--origin-indigo-600))] 
+           border border-transparent shadow-sm hover:shadow transition-all duration-200;
+  }
+  
+  .origin-button-secondary {
+    @apply bg-[oklch(var(--origin-gray-100))] text-[oklch(var(--origin-gray-900))] 
+           hover:bg-[oklch(var(--origin-gray-200))] border border-[oklch(var(--origin-gray-200))] 
+           shadow-sm hover:shadow transition-all duration-200;
+  }
+  
+  .origin-button-outline {
+    @apply border border-[oklch(var(--origin-indigo-500))] text-[oklch(var(--origin-indigo-500))] 
+           hover:bg-[oklch(var(--origin-indigo-500))] hover:text-white 
+           transition-all duration-200;
+  }
+  
+  .origin-card {
+    @apply bg-white border border-[oklch(var(--origin-gray-200))] rounded-lg shadow-sm 
+           hover:shadow transition-all duration-200;
+  }
+  
+  .dark .origin-card {
+    @apply bg-[oklch(var(--origin-gray-800))] border-[oklch(var(--origin-gray-700))];
+  }
+  
+  .dark .origin-button-secondary {
+    @apply bg-[oklch(var(--origin-gray-800))] text-[oklch(var(--origin-gray-100))] 
+           hover:bg-[oklch(var(--origin-gray-700))] border-[oklch(var(--origin-gray-700))];
   }
 }
 

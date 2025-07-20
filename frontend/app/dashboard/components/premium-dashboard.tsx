@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/origin/card';
-import { Button } from '@/components/ui/origin/button';
-import { StatusIndicator } from '@/components/ui/origin/status-indicator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { StatusIndicator } from '@/components/ui/status-indicator';
 import { 
   MessageSquare, 
   Users, 

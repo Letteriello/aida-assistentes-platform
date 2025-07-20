@@ -28,8 +28,8 @@ export function middleware(request: NextRequest) {
   );
   
   // Verificar se o usuário está autenticado
-  const apiKey = request.cookies.get('aida_api_key')?.value;
-  const isAuthenticated = !!apiKey || devBypass;
+  const authToken = request.cookies.get('aida_auth_token')?.value;
+  const isAuthenticated = !!authToken || devBypass;
   
   // Se está em rota pública e autenticado, redirecionar para dashboard
   if (isPublicRoute && isAuthenticated && !devBypass) {

@@ -3,8 +3,8 @@
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/origin/card';
-import { Button } from '@/components/ui/origin/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { 
   MessageSquare, 
   Smartphone, 

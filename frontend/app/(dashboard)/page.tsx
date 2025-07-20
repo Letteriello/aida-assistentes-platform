@@ -331,9 +331,9 @@ export default function DashboardPage() {
                 <div className="space-y-3">
                   {[
                     { action: 'Nova conversa iniciada', assistant: 'Suporte ao Cliente', time: '2 min atrás', type: 'info' },
-                    { action: 'Treinamento concluido com sucesso', assistant: 'Assistente de Vendas', time: '15 min atrás', type: 'success' },
-                    { action: 'Alto tempo de resposta detectado', assistant: 'Suporte Tecnico', time: '1 hora atrás', type: 'warning' },
-                    { action: 'Assistente implantado em produção', assistant: 'Guia de Produtos', time: '2 horas atrás', type: 'success' }
+            { action: 'Treinamento concluído com sucesso', assistant: 'Assistente de Vendas', time: '15 min atrás', type: 'success' },
+            { action: 'Alto tempo de resposta detectado', assistant: 'Suporte Técnico', time: '1 hora atrás', type: 'warning' },
+            { action: 'Assistente implantado em produção', assistant: 'Guia de Produtos', time: '2 horas atrás', type: 'success' }
                   ].map((activity, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
                       <div className={cn(

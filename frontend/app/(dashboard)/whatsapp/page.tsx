@@ -469,7 +469,7 @@ function WhatsAppPage() {
                       {!integration.configured && (
                         <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
                           <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                            ⚠️ Configuracao necessaria
+                            ⚠ Configuração necessária
                           </p>
                         </div>
                       )}

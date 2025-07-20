@@ -318,7 +318,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Input 
-                    value="••••••••••••••••••••••••••••••••"
+                    value="********************************"
                     readOnly
                     className="font-mono"
                   />

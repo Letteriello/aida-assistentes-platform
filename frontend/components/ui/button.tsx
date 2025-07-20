@@ -27,6 +27,10 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground active:scale-95",
         link: 
           "text-primary underline-offset-4 hover:underline active:scale-95",
+        // AIDA Premium variants
+        aida: "aida-gradient text-white hover:opacity-90 shadow-aida-soft hover:shadow-aida-premium active:scale-95",
+        aidaOutline: "border-2 border-aida-primary text-aida-primary hover:aida-gradient hover:text-white active:scale-95",
+        premium: "bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 shadow-lg active:scale-95",
       },
       size: {
         default: "h-9 px-4 py-2",

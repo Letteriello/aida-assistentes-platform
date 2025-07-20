@@ -228,7 +228,7 @@ function ConversationsPage() {
             <h3 className="text-lg font-semibold mb-2">Nenhuma conversa encontrada</h3>
             <p className="text-muted-foreground text-center">
               {conversations.length === 0 
-                ? 'Suas conversas aparecerao aqui quando os clientes comecarao a interagir com seus assistentes'
+                ? 'Suas conversas aparecerão aqui quando os clientes começarem a interagir com seus assistentes'
                 : 'Tente ajustar os filtros para encontrar as conversas que procura'
               }
             </p>
@@ -317,7 +317,7 @@ function ConversationsPage() {
                   </Badge>
                 </DialogTitle>
                 <DialogDescription>
-                  Conversa com {selectedConversation.assistant.name} • {selectedConversation._count.messages} mensagens
+                  Conversa com {selectedConversation.assistant.name} - {selectedConversation._count.messages} mensagens
                 </DialogDescription>
               </DialogHeader>
               
