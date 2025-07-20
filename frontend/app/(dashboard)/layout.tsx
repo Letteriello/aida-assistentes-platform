@@ -83,20 +83,18 @@ export default function DashboardLayout({
   const router = useRouter();
   const { user, logout, isAuthenticated, isLoading } = useAuthStore();
   
-  // Handle auth context safely
+  // Always call hooks at the top level
   let business = null;
+  try {
+    business = useBusiness();
+  } catch (error) {
+    // Auth context not available - handle gracefully
+    business = null;
+  }
   
   useEffect(() => {
     setMounted(true);
   }, []);
-  
-  if (mounted) {
-    try {
-      business = useBusiness();
-    } catch (error) {
-      console.warn('Auth context not available:', error);
-    }
-  }
 
   const handleLogout = async () => {
     try {
