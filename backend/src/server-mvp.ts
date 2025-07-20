@@ -1,6 +1,6 @@
 import { serve } from '@hono/node-server';
 import { createMVPRoutes } from './routes/mvp.routes';
-import { createSupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { Database } from './database/database.types';
 import { EvolutionAPIClient } from './lib/evolution-client';
 import { AidaMVPConfig } from './services/aida-mvp.service';
@@ -39,7 +39,7 @@ async function createServer() {
     validateEnvironment();
 
     // Create Supabase client
-    const supabase = createSupabaseClient<Database>(
+    const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
@@ -150,9 +150,7 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-// Start the server if this file is run directly
-if (require.main === module) {
-  startServer();
-}
+// Start the server
+startServer();
 
 export { createServer, startServer };

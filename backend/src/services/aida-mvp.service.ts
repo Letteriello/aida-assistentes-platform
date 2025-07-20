@@ -6,13 +6,17 @@ import { ProductCatalogService } from './product-catalog.service';
 import { ConversationService } from './conversation.service';
 import { Database } from '../database/database';
 
+import { SupabaseClient } from '@supabase/supabase-js';
+import { EvolutionAPIClient } from '../lib/evolution-client';
+
 export interface AidaMVPConfig {
-  supabaseUrl: string;
-  supabaseKey: string;
-  evolutionApiUrl: string;
-  evolutionApiKey: string;
+  supabase: SupabaseClient<Database>;
+  evolutionAPI: EvolutionAPIClient;
   jwtSecret: string;
+  openaiApiKey: string;
+  webhookUrl: string;
   adminInstanceName: string;
+  adminInstanceToken: string;
 }
 
 export interface UserOnboardingData {
@@ -46,40 +50,46 @@ export class AidaMVPService {
   private conversationService: ConversationService;
 
   constructor(private config: AidaMVPConfig) {
+    // Extract Supabase URL and key from the client for services that need them
+    const supabaseUrl = process.env.SUPABASE_URL!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const evolutionApiUrl = process.env.EVOLUTION_API_URL!;
+    const evolutionApiKey = process.env.EVOLUTION_API_KEY!;
+
     this.authService = new WhatsAppAuthService(
-      config.supabaseUrl,
-      config.supabaseKey,
-      config.evolutionApiUrl,
-      config.evolutionApiKey,
+      supabaseUrl,
+      supabaseKey,
+      evolutionApiUrl,
+      evolutionApiKey,
       config.jwtSecret,
       config.adminInstanceName
     );
 
     this.instanceService = new WhatsAppInstanceService(
-      config.supabaseUrl,
-      config.supabaseKey,
-      config.evolutionApiUrl,
-      config.evolutionApiKey
+      supabaseUrl,
+      supabaseKey,
+      evolutionApiUrl,
+      evolutionApiKey
     );
 
     this.billingService = new SimplifiedBillingService(
-      config.supabaseUrl,
-      config.supabaseKey
+      supabaseUrl,
+      supabaseKey
     );
 
     this.assistantService = new AssistantConfigService(
-      config.supabaseUrl,
-      config.supabaseKey
+      supabaseUrl,
+      supabaseKey
     );
 
     this.catalogService = new ProductCatalogService(
-      config.supabaseUrl,
-      config.supabaseKey
+      supabaseUrl,
+      supabaseKey
     );
 
     this.conversationService = new ConversationService(
-      config.supabaseUrl,
-      config.supabaseKey
+      supabaseUrl,
+      supabaseKey
     );
   }
 

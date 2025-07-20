@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Sequential Thinking Before File Operations",
+  "description": "Triggers sequential thinking process with 10-15 thoughts before any file creation or editing to generate deeper reasoning and reflection",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before proceeding with any file creation or editing operation, use MCP sequential thinking to generate between 10 to 15 thoughts for deeper reasoning and reflection about what you are going to do. Consider the implications, potential issues, best practices, and the overall impact of your changes. Only after completing this sequential thinking process should you proceed with the actual file operations."
+  }
+}
