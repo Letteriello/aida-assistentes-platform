@@ -131,6 +131,14 @@ select {
     --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.25);
     --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.05);
     
+    /* === AIDA PREMIUM COLOR SYSTEM === */
+    --aida-primary: 99 102 241;
+    --aida-secondary: 139 92 246;
+    --aida-accent: 6 182 212;
+    --aida-success: 16 185 129;
+    --aida-warning: 245 158 11;
+    --aida-error: 239 68 68;
+    
     /* === AIDA TECH UI VARIABLES === */
     --radius: 0.5rem; /* 8px rounded borders */
     --background: oklch(0.98 0.002 240);
@@ -637,6 +645,52 @@ select {
   
   .pill-badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  
+  /* === AIDA PREMIUM COMPONENT STYLES === */
+  .aida-gradient {
+    @apply bg-gradient-to-r from-aida-primary to-aida-secondary;
+  }
+  
+  .aida-card-premium {
+    @apply bg-white border border-gray-200 rounded-lg shadow-aida-soft hover:shadow-aida-premium transition-shadow duration-300;
+  }
+  
+  .aida-status-indicator {
+    @apply flex items-center space-x-2;
+  }
+  
+  .aida-status-dot {
+    @apply w-2 h-2 rounded-full animate-pulse-aida;
+  }
+  
+  .aida-status-connected {
+    @apply bg-aida-success;
+  }
+  
+  .aida-status-disconnected {
+    @apply bg-aida-error;
+  }
+  
+  .aida-status-connecting {
+    @apply bg-aida-warning;
+  }
+  
+  /* === ORIGIN UI PREMIUM UTILITIES === */
+  .origin-button-aida {
+    @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .origin-button-premium {
+    @apply bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 shadow-lg;
+  }
+  
+  .origin-card-premium {
+    @apply bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .dark .origin-card-premium {
+    @apply bg-gray-900/95 border-gray-700/50;
   }
 }
 

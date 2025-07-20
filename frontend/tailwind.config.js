@@ -116,6 +116,13 @@ module.exports = {
   				'on-dark': '#F9FAFB'
   			},
   			aida: {
+  				// AIDA Premium Color Scheme
+  				primary: '#6366f1',
+  				secondary: '#8b5cf6', 
+  				accent: '#06b6d4',
+  				success: '#10b981',
+  				warning: '#f59e0b',
+  				error: '#ef4444',
   				gold: {
   					'50': '#FFFBEB',
   					'100': '#FEF3C7',
@@ -274,6 +281,16 @@ module.exports = {
   				ring: 'oklch(var(--sidebar-ring))'
   			}
   		},
+  		backgroundImage: {
+  			'aida-gradient': 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+  			'aida-ai-gradient': 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+  			'premium-gradient': 'linear-gradient(135deg, #f59e0b, #f97316)',
+  		},
+  		boxShadow: {
+  			'aida-soft': '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+  			'aida-premium': '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+  			'premium-glow': '0 0 20px rgb(99 102 241 / 0.3)',
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -396,6 +413,14 @@ module.exports = {
   					transform: 'rotate(360deg)',
   					'box-shadow': '0 0 20px rgba(245, 158, 11, 0.5)'
   				}
+  			},
+  			"pulse-aida": {
+  				"0%, 100%": { opacity: 1 },
+  				"50%": { opacity: .5 },
+  			},
+  			"slide-in": {
+  				"0%": { transform: "translateX(-100%)" },
+  				"100%": { transform: "translateX(0)" },
   			}
   		},
   		animation: {
@@ -411,7 +436,9 @@ module.exports = {
   			float: 'float 3s ease-in-out infinite',
   			'prosperity-pulse': 'prosperity-pulse 2s ease-in-out infinite',
   			'text-glow': 'text-glow 2s ease-in-out infinite',
-  			'glow-rotate': 'glow-rotate 3s linear infinite'
+  			'glow-rotate': 'glow-rotate 3s linear infinite',
+  			"pulse-aida": "pulse-aida 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+  			"slide-in": "slide-in 0.3s ease-out"
   		}
   	}
   },
