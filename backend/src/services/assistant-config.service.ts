@@ -1,5 +1,5 @@
-import { supabase } from '../database/supabase-client';
-import { Database } from '../../../shared/types/database';
+import { getSupabaseClient } from '../database/supabase-client';
+import { Database } from '../database/database.types';
 
 type AssistantConfig = Database['public']['Tables']['assistant_configs']['Row'];
 type AssistantConfigInsert = Database['public']['Tables']['assistant_configs']['Insert'];
@@ -48,7 +48,7 @@ export class AssistantConfigService {
   }> {
     try {
       // Verifica se já existe configuração para esta instância
-      const { data: existingConfig } = await supabase
+      const { data: existingConfig } = await getSupabaseClient()
         .from('assistant_configs')
         .select('id')
         .eq('instance_id', instanceId)
@@ -64,7 +64,7 @@ export class AssistantConfigService {
       // Gera contexto estruturado baseado nas informações fornecidas
       const structuredContext = this.generateStructuredContext(config);
 
-      const { data: assistantConfig, error } = await supabase
+      const { data: assistantConfig, error } = await getSupabaseClient()
         .from('assistant_configs')
         .insert({
           instance_id: instanceId,
@@ -151,7 +151,7 @@ export class AssistantConfigService {
   }> {
     try {
       // Busca configuração atual
-      const { data: currentConfig, error: fetchError } = await supabase
+      const { data: currentConfig, error: fetchError } = await getSupabaseClient()
         .from('assistant_configs')
         .select('*')
         .eq('instance_id', instanceId)
@@ -179,7 +179,7 @@ export class AssistantConfigService {
       // Regenera contexto estruturado
       const structuredContext = this.generateStructuredContext(mergedConfig);
 
-      const { data: assistantConfig, error } = await supabase
+      const { data: assistantConfig, error } = await getSupabaseClient()
         .from('assistant_configs')
         .update({
           name: mergedConfig.name,
@@ -230,7 +230,7 @@ export class AssistantConfigService {
     message: string;
   }> {
     try {
-      const { data: assistantConfig, error } = await supabase
+      const { data: assistantConfig, error } = await getSupabaseClient()
         .from('assistant_configs')
         .select('*')
         .eq('instance_id', instanceId)
@@ -273,7 +273,7 @@ export class AssistantConfigService {
     message: string;
   }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('assistant_configs')
         .update({
           is_active: isActive,
@@ -310,7 +310,7 @@ export class AssistantConfigService {
     message: string;
   }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('assistant_configs')
         .delete()
         .eq('instance_id', instanceId);

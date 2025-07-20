@@ -1,4 +1,17 @@
-/** * AIDA Platform - Supabase Client with Multi-Tenant Support * s tenant-aware database operations with pgvector support * s use-cases/mcp-server/src/database/connection.ts patterns */ import type { SupabaseClien} from '@supabase/supabase-js'e } from '@shared/types/database'w new Error('Business ID is required for tenant isolation', 'public'{ 'x-business-id', 'public'{ 'x-business-id'e, column = null, 'embeddings'e); .select('*'t); // Apply business_id filter for tenant isolation query = query.eq('business_id'e.error('Vector search error: 'a,
-  error } = this.serviceClient.functions.invoke('generate-embeddings'e.error('Embedding generation error:'a, error } = this.client, .from('businesses') .select('id') .eq('id', 'healthy' | 'degraded' | 'error'y { // Check table accessibility const tables = ['businesses', 'assistants', 'conversations', 'messages',, 'knowledge_nodes'e).select('id'd) const vectorIndexes = [ 'conversations_embeddings_idx', 'messages_embeddings_idx', 'knowledge_embeddings_idx'e, s.length > 0 ? 'healthy', 'error', 'error't) .eq('business_id's) .eq('id'd) .eq('business_id'e); const businessId = headers?.['x-business-id'w new Error('Business ID not found in request,
-context'); }; return businessId;
-};
+import { createClient } from '@supabase/supabase-js';
+import { Database } from './database.types';
+
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+
+export function getSupabaseClient() {
+  return supabase;
+}
+
+export type { Database };

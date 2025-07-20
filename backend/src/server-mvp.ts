@@ -1,8 +1,8 @@
 import { serve } from '@hono/node-server';
 import { createMVPRoutes } from './routes/mvp.routes';
 import { createSupabaseClient } from '@supabase/supabase-js';
-import { Database } from './types/database';
-import { EvolutionAPIClient } from './lib/evolution-api';
+import { Database } from './database/database.types';
+import { EvolutionAPIClient } from './lib/evolution-client';
 import { AidaMVPConfig } from './services/aida-mvp.service';
 import dotenv from 'dotenv';
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AidaCard } from './aida-card';
-import { AidaButton } from './aida-button';
+import { Button } from '@/components/ui/button';
 import { CreditCard, TrendingUp, Receipt, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/design-system';
 
@@ -138,33 +138,33 @@ export function BillingCard({
 
         {/* Actions */}
         <div className="space-y-3 pt-2 border-t">
-          <AidaButton
-            variant="gold"
+          <Button
+            variant="golden"
             onClick={onUpgrade}
             icon={<TrendingUp className="w-4 h-4" />}
             className="w-full"
           >
             Fazer Upgrade do Plano
-          </AidaButton>
+          </Button>
           
           <div className="grid grid-cols-2 gap-2">
-            <AidaButton
+            <Button
               variant="outline"
               onClick={onViewBilling}
               icon={<Receipt className="w-4 h-4" />}
               size="sm"
             >
               Ver Faturas
-            </AidaButton>
+            </Button>
             
-            <AidaButton
+            <Button
               variant="outline"
               onClick={onUpdatePayment}
               icon={<CreditCard className="w-4 h-4" />}
               size="sm"
             >
               Atualizar Cartão
-            </AidaButton>
+            </Button>
           </div>
         </div>
 

@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { registerSchema, validateData } from '@/lib/validations';
+import { RegisterResponse } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Validação básica dos dados
-    const { name, contact_name, email, phone } = body;
+    // Validação dos dados com Zod
+    const validation = validateData(registerSchema, body);
     
-    if (!name || !contact_name || !email || !phone) {
+    if (!validation.success) {
       return NextResponse.json(
-        { message: 'Todos os campos são obrigatórios' },
+        { 
+          success: false,
+          message: 'Dados inválidos',
+          errors: validation.errors 
+        },
         { status: 400 }
       );
     }
+    
+    const { name, contact_name, email, phone } = validation.data;
     
     // Simulação de criação de conta e geração de API keys
     // Em produção, isso seria feito no backend real
@@ -25,20 +33,33 @@ export async function POST(request: NextRequest) {
     console.log('Conta criada:', { name, contact_name, email, phone });
     console.log('API Keys geradas:', apiKeys);
     
+    const response: RegisterResponse = {
+      business: {
+        id: `business_${Math.random().toString(36).substring(2, 15)}`,
+        name,
+        contact_name,
+        email,
+        phone,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      apiKeys
+    };
+    
     return NextResponse.json({
       success: true,
       message: 'Conta criada com sucesso',
-      business: {
-        id: `business_${Math.random().toString(36).substring(2, 15)}`,
-        name
-      },
-      apiKeys
+      data: response
     });
     
   } catch (error) {
     console.error('Erro no registro:', error);
     return NextResponse.json(
-      { message: 'Erro interno do servidor' },
+      { 
+        success: false,
+        message: 'Erro interno do servidor',
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      },
       { status: 500 }
     );
   }

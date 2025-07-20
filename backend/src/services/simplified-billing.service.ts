@@ -1,5 +1,5 @@
-import { supabase } from '../database/supabase-client';
-import { Database } from '../../../shared/types/database';
+import { getSupabaseClient } from '../database/supabase-client';
+import { Database } from '../database/database.types';
 
 type BillingCycle = Database['public']['Tables']['billing_cycles']['Row'];
 type BillingCycleInsert = Database['public']['Tables']['billing_cycles']['Insert'];
@@ -28,7 +28,7 @@ export class SimplifiedBillingService {
       const cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Último dia do mês
       const dueDate = new Date(cycleEnd.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias após o fim do ciclo
 
-      const { data: billingCycle, error } = await supabase
+      const { data: billingCycle, error } = await getSupabaseClient()
         .from('billing_cycles')
         .insert({
           instance_id: instanceId,
@@ -84,7 +84,7 @@ export class SimplifiedBillingService {
     try {
       const now = new Date();
       
-      const { data: billingCycle, error } = await supabase
+      const { data: billingCycle, error } = await getSupabaseClient()
         .from('billing_cycles')
         .select('*')
         .eq('instance_id', instanceId)
@@ -150,7 +150,7 @@ export class SimplifiedBillingService {
       const usageDetails = cycle.usage_details as any || { messages_by_day: {}, documents_by_day: {}, overage_charges: 0 };
       usageDetails.messages_by_day[today] = (usageDetails.messages_by_day[today] || 0) + 1;
 
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('billing_cycles')
         .update({
           message_count: newCount,
@@ -222,7 +222,7 @@ export class SimplifiedBillingService {
       const usageDetails = cycle.usage_details as any || { messages_by_day: {}, documents_by_day: {}, overage_charges: 0 };
       usageDetails.documents_by_day[today] = (usageDetails.documents_by_day[today] || 0) + 1;
 
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('billing_cycles')
         .update({
           document_count: newCount,
@@ -390,7 +390,7 @@ export class SimplifiedBillingService {
       let created = 0;
 
       // Busca instâncias ativas que precisam de novo ciclo
-      const { data: instances, error } = await supabase
+      const { data: instances, error } = await getSupabaseClient()
         .from('whatsapp_instances')
         .select('id')
         .eq('status', 'active');

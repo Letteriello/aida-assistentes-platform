@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { AidaCard } from './aida-card';
-import { AidaButton } from './aida-button';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { StatusIndicator } from './status-indicator';
 import { Bot, Settings, Play, Pause, Trash2, MessageSquare, Users, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/design-system';
@@ -69,7 +69,7 @@ export function AssistantCard({
   const isActive = assistant.status === 'connected';
 
   return (
-    <AidaCard
+    <Card
       className={cn(
         'transition-all duration-200 hover:shadow-lg',
         assistant.status === 'connected' ? 'ring-1 ring-green-200' : '',
@@ -181,7 +181,7 @@ export function AssistantCard({
         {/* Actions */}
         {showActions && (
           <div className="flex gap-2 pt-2 border-t">
-            <AidaButton
+            <Button
               variant="outline"
               size="sm"
               onClick={() => onTest?.(assistant.id)}
@@ -189,9 +189,9 @@ export function AssistantCard({
               className="flex-1"
             >
               Testar
-            </AidaButton>
+            </Button>
             
-            <AidaButton
+            <Button
               variant="outline"
               size="sm"
               onClick={() => onEdit?.(assistant.id)}
@@ -199,9 +199,9 @@ export function AssistantCard({
               className="flex-1"
             >
               Editar
-            </AidaButton>
+            </Button>
             
-            <AidaButton
+            <Button
               variant="outline"
               size="sm"
               onClick={() => onToggleStatus?.(assistant.id, isActive ? 'stop' : 'start')}
@@ -212,9 +212,9 @@ export function AssistantCard({
               )}
             >
               {isActive ? 'Pausar' : 'Iniciar'}
-            </AidaButton>
+            </Button>
             
-            <AidaButton
+            <Button
               variant="outline"
               size="sm"
               onClick={() => onDelete?.(assistant.id)}
@@ -222,10 +222,10 @@ export function AssistantCard({
               className="text-red-600 hover:text-red-700"
             >
               Excluir
-            </AidaButton>
+            </Button>
           </div>
         )}
       </div>
-    </AidaCard>
+    </Card>
   );
 }

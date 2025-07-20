@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { AidaCard } from './aida-card';
-import { AidaButton } from './aida-button';
+import { Button } from '@/components/ui/button';
 import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/design-system';
 
@@ -172,9 +172,9 @@ export function DocumentUpload({
                   </p>
                 </div>
                 
-                <AidaButton variant="outline" size="sm">
+                <Button variant="outline" size="sm">
                   Selecionar Arquivos
-                </AidaButton>
+                </Button>
               </>
             ) : (
               <div>

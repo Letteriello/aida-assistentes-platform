@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ProgressBar } from './progress-bar';
-import { AidaButton } from './aida-button';
+import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText, Smartphone, TrendingUp } from 'lucide-react';
 
 interface UsageData {
@@ -93,7 +93,7 @@ export function UsageMeter({
               </div>
               
               {showUpgradeButtons && needsUpgrade && item.onUpgrade && (
-                <AidaButton
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={item.onUpgrade}
@@ -101,7 +101,7 @@ export function UsageMeter({
                   icon={<TrendingUp className="w-4 h-4" />}
                 >
                   {item.upgradeText}
-                </AidaButton>
+                </Button>
               )}
             </div>
           );

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StatusIndicator } from './status-indicator';
-import { AidaButton } from './aida-button';
+import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Smartphone, QrCode } from 'lucide-react';
 
 interface ConnectionStatusProps {
@@ -118,7 +118,7 @@ export function ConnectionStatus({
         {/* Action buttons */}
         <div className="flex gap-2 pt-2">
           {status === 'disconnected' || status === 'error' ? (
-            <AidaButton
+            <Button
               variant="primary"
               onClick={onReconnect}
               loading={loading}
@@ -127,11 +127,11 @@ export function ConnectionStatus({
               className="flex-1"
             >
               Reconectar Agora
-            </AidaButton>
+            </Button>
           ) : null}
           
           {status === 'connecting' && (
-            <AidaButton
+            <Button
               variant="outline"
               onClick={onRefreshQR}
               loading={loading}
@@ -139,18 +139,18 @@ export function ConnectionStatus({
               className="flex-1"
             >
               Gerar Novo QR
-            </AidaButton>
+            </Button>
           )}
           
           {status === 'connected' && (
-            <AidaButton
+            <Button
               variant="outline"
               onClick={onDisconnect}
               icon={<WifiOff className="w-4 h-4" />}
               className="flex-1"
             >
               Desconectar
-            </AidaButton>
+            </Button>
           )}
         </div>
       </div>

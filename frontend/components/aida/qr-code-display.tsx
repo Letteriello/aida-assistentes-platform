@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AidaCard } from './aida-card';
-import { AidaButton } from './aida-button';
+import { Button } from '@/components/ui/button';
 import { QrCode, RefreshCw, Smartphone, CheckCircle, Copy } from 'lucide-react';
 
 interface QRCodeDisplayProps {
@@ -135,20 +135,20 @@ export function QRCodeDisplay({
           </div>
           
           <div className="mt-3 pt-3 border-t border-blue-200">
-            <AidaButton
+            <Button
               variant="outline"
               size="sm"
               onClick={handleCopyInstructions}
               icon={copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             >
               {copied ? 'Copiado!' : 'Copiar instruções'}
-            </AidaButton>
+            </Button>
           </div>
         </div>
 
         {/* Action buttons */}
         <div className="flex gap-3">
-          <AidaButton
+          <Button
             variant="outline"
             onClick={onRefresh}
             loading={loading}
@@ -157,16 +157,16 @@ export function QRCodeDisplay({
             className="flex-1"
           >
             Gerar Novo QR
-          </AidaButton>
+          </Button>
           
           {onCancel && (
-            <AidaButton
+            <Button
               variant="ghost"
               onClick={onCancel}
               className="flex-1"
             >
               Cancelar
-            </AidaButton>
+            </Button>
           )}
         </div>
 

@@ -1,6 +1,6 @@
 // AIDA Components - Híbridos Origin UI + Funcionalidade AIDA
 export { AidaCard } from './aida-card';
-export { AidaButton } from './aida-button';
+
 export { StatusIndicator } from './status-indicator';
 export { ProgressBar } from './progress-bar';
 export { UsageMeter } from './usage-meter';

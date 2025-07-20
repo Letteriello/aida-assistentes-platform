@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { AidaCard } from './aida-card';
-import { AidaButton } from './aida-button';
+import { Button } from '@/components/ui/button';
 import { Send, User, Bot, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/design-system';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -238,7 +238,7 @@ export function ChatInterface({
               rows={1}
             />
             
-            <AidaButton
+            <Button
               onClick={handleSend}
               disabled={!inputValue.trim() || isSending || isLoading}
               loading={isSending}
@@ -246,7 +246,7 @@ export function ChatInterface({
               className="self-end"
             >
               Enviar
-            </AidaButton>
+            </Button>
           </div>
           
           <p className="text-xs text-muted-foreground mt-2">

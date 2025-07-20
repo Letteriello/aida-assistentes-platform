@@ -53,6 +53,27 @@ module.exports = {
   		'light': {'raw': '(prefers-color-scheme: light)'},
   	},
   	extend: {
+        spacing: {
+            '128': '32rem',
+            '144': '36rem',
+        },
+        fontFamily: {
+            sans: ['var(--font-sans)', 'sans-serif'],
+            heading: ['var(--font-heading)', 'sans-serif'],
+        },
+        fontSize: {
+            'xs': ['0.75rem', { lineHeight: '1rem' }],
+            'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+            'base': ['1rem', { lineHeight: '1.5rem' }],
+            'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+            'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+            '2xl': ['1.5rem', { lineHeight: '2rem' }],
+            '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+            '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+            '5xl': ['3rem', { lineHeight: '1' }],
+            '6xl': ['3.75rem', { lineHeight: '1' }],
+            '7xl': ['4.5rem', { lineHeight: '1' }],
+        },
   		colors: {
   			border: 'oklch(var(--border))',
   			input: 'oklch(var(--input))',
@@ -237,32 +258,32 @@ module.exports = {
 				'900': '#78350F',
 				DEFAULT: '#D97706'
 			},
-			'tech-blue': {
-				'50': 'oklch(var(--tech-blue-50))',
-				'100': 'oklch(var(--tech-blue-100))',
-				'200': 'oklch(var(--tech-blue-200))',
-				'300': 'oklch(var(--tech-blue-300))',
-				'400': 'oklch(var(--tech-blue-400))',
-				'500': 'oklch(var(--tech-blue-500))',
-				'600': 'oklch(var(--tech-blue-600))',
-				'700': 'oklch(var(--tech-blue-700))',
-				'800': 'oklch(var(--tech-blue-800))',
-				'900': 'oklch(var(--tech-blue-900))',
-				DEFAULT: 'oklch(var(--tech-blue-500))'
-			},
-			'tech-dark': {
-				'50': 'oklch(var(--tech-dark-50))',
-				'100': 'oklch(var(--tech-dark-100))',
-				'200': 'oklch(var(--tech-dark-200))',
-				'300': 'oklch(var(--tech-dark-300))',
-				'400': 'oklch(var(--tech-dark-400))',
-				'500': 'oklch(var(--tech-dark-500))',
-				'600': 'oklch(var(--tech-dark-600))',
-				'700': 'oklch(var(--tech-dark-700))',
-				'800': 'oklch(var(--tech-dark-800))',
-				'900': 'oklch(var(--tech-dark-900))',
-				DEFAULT: 'oklch(var(--tech-dark-800))'
-			},
+  			'tech-blue': {
+  				'50': 'oklch(var(--tech-blue-50))',
+  				'100': 'oklch(var(--tech-blue-100))',
+  				'200': 'oklch(var(--tech-blue-200))',
+  				'300': 'oklch(var(--tech-blue-300))',
+  				'400': 'oklch(var(--tech-blue-400))',
+  				'500': 'oklch(var(--tech-blue-500))',
+  				'600': 'oklch(var(--tech-blue-600))',
+  				'700': 'oklch(var(--tech-blue-700))',
+  				'800': 'oklch(var(--tech-blue-800))',
+  				'900': 'oklch(var(--tech-blue-900))',
+  				DEFAULT: 'oklch(var(--tech-blue-500))'
+  			},
+  			'tech-dark': {
+  				'50': 'oklch(var(--tech-dark-50))',
+  				'100': 'oklch(var(--tech-dark-100))',
+  				'200': 'oklch(var(--tech-dark-200))',
+  				'300': 'oklch(var(--tech-dark-300))',
+  				'400': 'oklch(var(--tech-dark-400))',
+  				'500': 'oklch(var(--tech-dark-500))',
+  				'600': 'oklch(var(--tech-dark-600))',
+  				'700': 'oklch(var(--tech-dark-700))',
+  				'800': 'oklch(var(--tech-dark-800))',
+  				'900': 'oklch(var(--tech-dark-900))',
+  				DEFAULT: 'oklch(var(--tech-dark-800))'
+  			},
   			chart: {
   				'1': 'oklch(var(--chart-1))',
   				'2': 'oklch(var(--chart-2))',

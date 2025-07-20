@@ -1,18 +1,118 @@
 /**
  * AIDA Platform - Database Types
- * Unified types for Supabase database schema with multi-tenant architecture
- * CRITICAL: Must be consistent with shared/types/database.ts
+ * Unified types for Supabase database schema
  */
-// Re-export from shared types for consistency
-// Legacy compatibility - keep this file for now but delegate to shared types
-// Helper type for JSON columns (backward compatibility)
-export type * from '@shared/types/database';
-import type { Database as SharedDatabase } from '@shared/types/database';
-export interface Database extends SharedDatabase {}
-export type Json = | string;
+
+export type Json =
+  | string
   | number
   | boolean
   | null
-  | {
-      [key: string]: Json | undefined;
+  | { [key: string]: Json | undefined }
   | Json[];
+
+export interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: {
+          id: string;
+          phone: string;
+          name: string | null;
+          business_name: string | null;
+          business_type: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          phone: string;
+          name?: string | null;
+          business_name?: string | null;
+          business_type?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          phone?: string;
+          name?: string | null;
+          business_name?: string | null;
+          business_type?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      whatsapp_instances: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          status: string;
+          qr_code: string | null;
+          message_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          status?: string;
+          qr_code?: string | null;
+          message_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          status?: string;
+          qr_code?: string | null;
+          message_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      verification_codes: {
+        Row: {
+          id: string;
+          phone: string;
+          code: string;
+          expires_at: string;
+          used: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          phone: string;
+          code: string;
+          expires_at: string;
+          used?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          phone?: string;
+          code?: string;
+          expires_at?: string;
+          used?: boolean;
+          created_at?: string;
+        };
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+}
