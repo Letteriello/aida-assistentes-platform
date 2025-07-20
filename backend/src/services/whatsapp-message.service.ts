@@ -1,4 +1,8 @@
 import { AIModelRouter, ModelComplexity } from './ai-model-router.service';
+import { RAGEngineV2, RetrievalResult } from './rag-engine-v2.service';
+import { CacheManager } from './cache-manager.service';
+import { AutomationEngine } from './automation-engine.service';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export interface IncomingMessage {
   instanceId: string;
@@ -8,6 +12,8 @@ export interface IncomingMessage {
   timestamp: Date;
   conversationId: string;
   messageType: 'text' | 'image' | 'document' | 'audio';
+  messageId: string;
+  customerName?: string;
 }
 
 export interface MessageContext {
@@ -18,46 +24,130 @@ export interface MessageContext {
     type: string;
     hours: string;
     policies: string;
+    description?: string;
   };
+  ragContext?: RetrievalResult;
+  customerProfile?: {
+    name: string;
+    segment: string;
+    lastInteraction: Date;
+    messageCount: number;
+  };
+}
+
+export interface ProcessedResponse {
+  content: string;
+  model: string;
+  responseTime: number;
+  confidence: number;
+  sources: string[];
+  cost: number;
 }
 
 export class WhatsAppMessageService {
   private aiRouter: AIModelRouter;
+  private ragEngine: RAGEngineV2;
+  private cacheManager: CacheManager;
+  private automationEngine: AutomationEngine;
+  private supabase: SupabaseClient;
   
-  constructor() {
+  constructor(supabase: SupabaseClient, neo4jDriver?: any) {
+    this.supabase = supabase;
     this.aiRouter = new AIModelRouter();
+    this.cacheManager = new CacheManager();
+    this.ragEngine = new RAGEngineV2(supabase, neo4jDriver);
+    this.automationEngine = new AutomationEngine(this.aiRouter, this.cacheManager);
   }
 
-  async processMessage(message: IncomingMessage): Promise<void> {
+  async processMessage(message: IncomingMessage): Promise<ProcessedResponse> {
+    const startTime = Date.now();
+    
     try {
-      // Analisar complexidade da mensagem
+      // 1. Check cache for recent similar messages
+      const cacheKey = `message:${message.businessId}:${this.hashMessage(message.content)}`;
+      const cachedResponse = await this.cacheManager.get<ProcessedResponse>(cacheKey);
+      
+      if (cachedResponse) {
+        console.log('Using cached response for message');
+        await this.sendWhatsAppMessage(message.instanceId, message.from, cachedResponse.content);
+        return cachedResponse;
+      }
+
+      // 2. Run automation engine first (for immediate responses)
+      await this.automationEngine.processMessage({
+        instanceId: message.instanceId,
+        businessId: message.businessId,
+        from: message.from,
+        content: message.content,
+        timestamp: message.timestamp
+      });
+
+      // 3. Analyze message complexity
       const complexity = this.analyzeMessageComplexity(message.content);
-      const contextSize = await this.getContextSize(message.businessId, message.conversationId);
       
-      // Buscar contexto do RAG
-      const context = await this.retrieveContext(message.content, message.businessId);
+      // 4. Retrieve context using RAG Engine v2
+      const ragContext = await this.ragEngine.hybridRetrieval(
+        message.content,
+        message.businessId,
+        {
+          maxResults: complexity === 'complex' ? 15 : 8,
+          threshold: 0.7,
+          useCache: true,
+          enableGraphExpansion: complexity === 'complex'
+        }
+      );
+
+      // 5. Build comprehensive context
+      const context = await this.buildComprehensiveContext(message, ragContext);
+      const contextSize = this.calculateContextSize(context);
       
-      // Montar prompt com contexto
-      const prompt = this.buildPrompt(message.content, context);
+      // 6. Build optimized prompt
+      const prompt = this.buildOptimizedPrompt(message.content, context);
       
-      // Rotear para modelo otimizado
+      // 7. Route to optimal AI model
       const aiResponse = await this.aiRouter.routeToOptimalModel({
         prompt,
         complexity,
         contextSize,
-        requiresThinking: complexity === 'complex',
+        requiresThinking: complexity === 'complex' || ragContext.confidence < 0.6,
         businessId: message.businessId,
         conversationId: message.conversationId
       });
       
-      // Enviar resposta
-      await this.sendWhatsAppMessage(message.instanceId, message.from, aiResponse.content);
+      // 8. Prepare processed response
+      const processedResponse: ProcessedResponse = {
+        content: aiResponse.content,
+        model: aiResponse.model,
+        responseTime: Date.now() - startTime,
+        confidence: ragContext.confidence,
+        sources: ragContext.sources,
+        cost: aiResponse.usage.cost
+      };
+
+      // 9. Cache successful response
+      await this.cacheManager.set(cacheKey, processedResponse, { ttl: 3600 });
       
-      // Salvar mensagem e métricas
-      await this.saveConversation(message, aiResponse);
+      // 10. Send response via WhatsApp
+      await this.sendWhatsAppMessage(message.instanceId, message.from, processedResponse.content);
+      
+      // 11. Save conversation and analytics
+      await this.saveConversationWithAnalytics(message, processedResponse, context);
+      
+      return processedResponse;
+      
     } catch (error) {
       console.error('Error processing message:', error);
       await this.sendErrorMessage(message.instanceId, message.from);
+      
+      // Return error response
+      return {
+        content: 'Desculpe, ocorreu um erro temporário. Tente novamente em alguns minutos.',
+        model: 'error',
+        responseTime: Date.now() - startTime,
+        confidence: 0,
+        sources: [],
+        cost: 0
+      };
     }
   }
 
@@ -161,29 +251,210 @@ RESPOSTA:`;
     console.log(`Saving conversation for ${message.businessId}`);
   }
 
-  // Métodos auxiliares (implementar conforme necessário)
+  // Novos métodos auxiliares integrados
+  private hashMessage(content: string): string {
+    // Simple hash for caching similar messages
+    return require('crypto').createHash('md5').update(content.toLowerCase().trim()).digest('hex');
+  }
+
+  private async buildComprehensiveContext(message: IncomingMessage, ragContext: RetrievalResult): Promise<MessageContext> {
+    const [conversationHistory, businessInfo, customerProfile] = await Promise.all([
+      this.getRecentMessages(message.conversationId, 10),
+      this.getBusinessInfo(message.businessId),
+      this.getCustomerProfile(message.from, message.businessId)
+    ]);
+
+    return {
+      conversationHistory,
+      knowledgeBase: ragContext.documents.map(doc => doc.content).join('\n\n'),
+      businessInfo,
+      ragContext,
+      customerProfile
+    };
+  }
+
+  private calculateContextSize(context: MessageContext): number {
+    const conversationSize = context.conversationHistory.join(' ').length;
+    const knowledgeSize = context.knowledgeBase.length;
+    const businessInfoSize = JSON.stringify(context.businessInfo).length;
+    
+    return conversationSize + knowledgeSize + businessInfoSize;
+  }
+
+  private buildOptimizedPrompt(userMessage: string, context: MessageContext): string {
+    const ragSources = context.ragContext?.sources.join(', ') || 'base de conhecimento';
+    const confidence = context.ragContext?.confidence || 0;
+    
+    return `
+Você é ${context.businessInfo.name}, um assistente de IA especializado em ${context.businessInfo.type}.
+
+INFORMAÇÕES DA EMPRESA:
+- Nome: ${context.businessInfo.name}
+- Tipo: ${context.businessInfo.type}
+- Horário: ${context.businessInfo.hours}
+- Políticas: ${context.businessInfo.policies}
+${context.businessInfo.description ? `- Descrição: ${context.businessInfo.description}` : ''}
+
+PERFIL DO CLIENTE:
+${context.customerProfile ? `
+- Nome: ${context.customerProfile.name}
+- Segmento: ${context.customerProfile.segment}
+- Mensagens anteriores: ${context.customerProfile.messageCount}
+- Última interação: ${context.customerProfile.lastInteraction.toLocaleDateString('pt-BR')}
+` : '- Cliente novo ou perfil não disponível'}
+
+CONTEXTO RELEVANTE (Confiança: ${Math.round(confidence * 100)}%):
+${context.knowledgeBase || 'Nenhum contexto específico encontrado.'}
+
+HISTÓRICO DA CONVERSA (últimas mensagens):
+${context.conversationHistory.slice(-5).join('\n') || 'Primeira mensagem da conversa.'}
+
+MENSAGEM DO CLIENTE:
+"${userMessage}"
+
+INSTRUÇÕES:
+1. Responda como ${context.businessInfo.name}, mantendo o tom profissional mas amigável
+2. Use as informações do contexto quando relevantes (confiança: ${Math.round(confidence * 100)}%)
+3. Se a confiança for baixa (<60%), seja honesto sobre limitações e ofereça ajuda geral
+4. Personalize com base no perfil do cliente quando disponível
+5. Mantenha respostas concisas (máximo 150 palavras)
+6. Se apropriado, mencione que as informações vêm de: ${ragSources}
+
+RESPOSTA:`;
+  }
+
+  private async saveConversationWithAnalytics(
+    message: IncomingMessage, 
+    response: ProcessedResponse, 
+    context: MessageContext
+  ): Promise<void> {
+    try {
+      // Save conversation
+      await this.supabase.from('conversations').insert({
+        id: message.conversationId,
+        business_id: message.businessId,
+        customer_phone: message.from,
+        customer_name: message.customerName || context.customerProfile?.name,
+        last_message_at: new Date(),
+        message_count: (context.customerProfile?.messageCount || 0) + 1,
+        updated_at: new Date()
+      });
+
+      // Save message
+      await this.supabase.from('messages').insert({
+        id: message.messageId,
+        conversation_id: message.conversationId,
+        from_customer: true,
+        content: message.content,
+        message_type: message.messageType,
+        timestamp: message.timestamp
+      });
+
+      // Save AI response
+      await this.supabase.from('messages').insert({
+        conversation_id: message.conversationId,
+        from_customer: false,
+        content: response.content,
+        message_type: 'text',
+        timestamp: new Date(),
+        ai_model: response.model,
+        response_time_ms: response.responseTime,
+        confidence_score: response.confidence,
+        cost: response.cost
+      });
+
+      // Save analytics
+      await this.supabase.from('message_analytics').insert({
+        business_id: message.businessId,
+        message_id: message.messageId,
+        model_used: response.model,
+        complexity: this.analyzeMessageComplexity(message.content),
+        response_time_ms: response.responseTime,
+        confidence_score: response.confidence,
+        cost: response.cost,
+        sources_used: response.sources,
+        cache_hit: false, // Would be true if response was cached
+        timestamp: new Date()
+      });
+
+    } catch (error) {
+      console.error('Error saving conversation analytics:', error);
+    }
+  }
+
+  private async getCustomerProfile(phone: string, businessId: string): Promise<MessageContext['customerProfile'] | undefined> {
+    try {
+      const { data } = await this.supabase
+        .from('customers')
+        .select('name, segment, last_interaction_at, message_count')
+        .eq('phone', phone)
+        .eq('business_id', businessId)
+        .single();
+
+      if (data) {
+        return {
+          name: data.name || 'Cliente',
+          segment: data.segment || 'default',
+          lastInteraction: new Date(data.last_interaction_at),
+          messageCount: data.message_count || 0
+        };
+      }
+    } catch (error) {
+      console.log('Customer profile not found, treating as new customer');
+    }
+    
+    return undefined;
+  }
+
+  // Métodos auxiliares atualizados
   private async getRecentMessages(conversationId: string, limit: number): Promise<string[]> {
-    // Implementar busca de mensagens recentes
+    try {
+      const { data } = await this.supabase
+        .from('messages')
+        .select('content, from_customer, timestamp')
+        .eq('conversation_id', conversationId)
+        .order('timestamp', { ascending: false })
+        .limit(limit);
+
+      if (data) {
+        return data
+          .reverse() // Show chronological order
+          .map(msg => `${msg.from_customer ? 'Cliente' : 'Assistente'}: ${msg.content}`);
+      }
+    } catch (error) {
+      console.error('Error fetching recent messages:', error);
+    }
+    
     return [];
   }
 
-  private async getKnowledgeBaseSize(businessId: string): Promise<number> {
-    // Implementar cálculo do tamanho da base de conhecimento
-    return 5000;
-  }
+  private async getBusinessInfo(businessId: string): Promise<MessageContext['businessInfo']> {
+    try {
+      const { data } = await this.supabase
+        .from('businesses')
+        .select('name, business_type, operating_hours, policies, description')
+        .eq('id', businessId)
+        .single();
 
-  private async getBusinessKnowledge(businessId: string): Promise<string> {
-    // Implementar busca da base de conhecimento
-    return "Base de conhecimento da empresa...";
-  }
+      if (data) {
+        return {
+          name: data.name || 'Empresa',
+          type: data.business_type || 'Comércio',
+          hours: data.operating_hours || '9h às 18h',
+          policies: data.policies || 'Consulte nossas políticas no site',
+          description: data.description
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching business info:', error);
+    }
 
-  private async getBusinessInfo(businessId: string): Promise<any> {
-    // Implementar busca de informações da empresa
+    // Default fallback
     return {
       name: "Empresa",
-      type: "Comércio",
+      type: "Comércio", 
       hours: "9h às 18h",
-      policies: "Políticas da empresa..."
+      policies: "Consulte nossas políticas"
     };
   }
 }

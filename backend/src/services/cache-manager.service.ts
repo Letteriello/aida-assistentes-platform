@@ -12,15 +12,69 @@ export class CacheManager {
   private maxMemoryItems = 1000;
 
   constructor() {
-    this.redis = new Redis({
+    // Configure Redis connection
+    const redisOptions: any = {
       host: process.env.REDIS_HOST || 'localhost',
       port: parseInt(process.env.REDIS_PORT || '6379'),
+      db: parseInt(process.env.REDIS_DB || '0'),
       maxRetriesPerRequest: 3,
-      retryDelayOnFailover: 100
-    });
+      retryDelayOnFailover: 100,
+      lazyConnect: true, // Connect only when needed
+      keepAlive: 30000,
+      connectTimeout: 10000,
+      commandTimeout: 5000
+    };
+
+    // Add password if provided
+    if (process.env.REDIS_PASSWORD) {
+      redisOptions.password = process.env.REDIS_PASSWORD;
+    }
+
+    // Use Redis URL if provided (overrides individual settings)
+    if (process.env.REDIS_URL) {
+      this.redis = new Redis(process.env.REDIS_URL, {
+        maxRetriesPerRequest: 3,
+        retryDelayOnFailover: 100,
+        lazyConnect: true,
+        keepAlive: 30000,
+        connectTimeout: 10000,
+        commandTimeout: 5000
+      });
+    } else {
+      this.redis = new Redis(redisOptions);
+    }
+
+    // Setup Redis event handlers
+    this.setupRedisEventHandlers();
     
     // Cleanup memory cache periodically
     setInterval(() => this.cleanupMemoryCache(), 60000); // Every minute
+  }
+
+  private setupRedisEventHandlers() {
+    this.redis.on('connect', () => {
+      console.log('✅ Redis connected successfully');
+    });
+
+    this.redis.on('ready', () => {
+      console.log('🚀 Redis ready to receive commands');
+    });
+
+    this.redis.on('error', (error) => {
+      console.error('❌ Redis connection error:', error.message);
+    });
+
+    this.redis.on('close', () => {
+      console.warn('⚠️ Redis connection closed');
+    });
+
+    this.redis.on('reconnecting', () => {
+      console.log('🔄 Redis reconnecting...');
+    });
+
+    this.redis.on('end', () => {
+      console.log('🔌 Redis connection ended');
+    });
   }
 
   async get<T>(key: string, options: CacheOptions = {}): Promise<T | null> {

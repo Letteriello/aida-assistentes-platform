@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { EvolutionAPIClient } from '../evolution-api/client';
-import { Database } from '../../../shared/types/database';
+import { EvolutionAPIClient } from '../lib/evolution-client';
+import { Database } from '../database/database.types';
 
 type SupabaseClient = ReturnType<typeof createClient<Database>>;
 
@@ -94,41 +94,36 @@ export class WhatsAppInstanceService {
       const evolutionResult = await this.evolutionClient.createInstance({
         instanceName: evolutionInstanceId,
         qrcode: true,
-        integration: 'WHATSAPP-BAILEYS'
+        webhook: {
+          url: webhookUrl,
+          events: ['MESSAGES_UPSERT', 'CONNECTION_UPDATE', 'QRCODE_UPDATED']
+        }
       });
 
-      if (!evolutionResult.success) {
-        return {
-          success: false,
-          message: 'Erro ao criar instância no Evolution API',
-          error: evolutionResult.error
-        };
-      }
+      // Evolution API retorna dados diretamente, não um objeto com success
+      console.log('Evolution API response:', evolutionResult);
 
-      // Setup webhook
-      const webhookUrl = request.webhookUrl || `${this.webhookBaseUrl}/webhook/${evolutionInstanceId}`;
-      await this.setupInstanceWebhook(evolutionInstanceId, webhookUrl);
-
-      // Get initial QR code
-      const qrResult = await this.evolutionClient.getInstanceQRCode(evolutionInstanceId);
-      const qrCode = qrResult.data?.qrcode?.base64;
+      // Get initial QR code from creation response
+      const qrCode = evolutionResult.qrcode?.base64;
 
       // Store instance in database
+      const webhookUrl = request.webhookUrl || `${this.webhookBaseUrl}/webhook/instances/${evolutionInstanceId}`;
+      
       const { data: instance, error: dbError } = await this.supabase
         .from('whatsapp_instances')
         .insert({
           user_id: request.userId,
           evolution_instance_id: evolutionInstanceId,
-          instance_name: request.instanceName,
-          status: 'pending',
-          connection_state: 'qr',
-          qr_code: qrCode,
-          qr_code_updated_at: qrCode ? new Date().toISOString() : undefined,
+          name: request.instanceName,
+          status: 'creating',
+          qr_code_url: qrCode,
           webhook_url: webhookUrl,
-          metadata: {
-            created_via: 'api',
-            evolution_response: evolutionResult.data
-          }
+          evolution_api_url: process.env.EVOLUTION_API_URL || 'http://localhost:8080',
+          evolution_api_key: process.env.EVOLUTION_API_KEY || '',
+          message_count: 0,
+          document_count: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         })
         .select()
         .single();
@@ -257,33 +252,40 @@ export class WhatsAppInstanceService {
       }
 
       // Get QR code from Evolution API
-      const qrResult = await this.evolutionClient.getInstanceQRCode(instance.evolution_instance_id);
-      
-      if (!qrResult.success || !qrResult.data?.qrcode?.base64) {
+      try {
+        const connection = await this.evolutionClient.connectInstance(instance.evolution_instance_id);
+        const qrCode = connection.qrcode?.base64;
+        
+        if (!qrCode) {
+          return {
+            success: false,
+            message: 'QR Code não disponível. A instância pode já estar conectada.'
+          };
+        }
+
+        // Update QR code in database
+        await this.supabase
+          .from('whatsapp_instances')
+          .update({
+            qr_code_url: qrCode,
+            status: 'qrcode',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', instanceId);
+
+        return {
+          success: true,
+          qrCode,
+          message: 'QR Code atualizado com sucesso'
+        };
+        
+      } catch (error) {
+        console.error('Error getting QR code:', error);
         return {
           success: false,
-          message: 'Erro ao obter QR Code. Verifique se a instância está no estado correto.'
+          message: 'Erro ao obter QR Code da Evolution API'
         };
       }
-
-      const qrCode = qrResult.data.qrcode.base64;
-
-      // Update QR code in database
-      await this.supabase
-        .from('whatsapp_instances')
-        .update({
-          qr_code: qrCode,
-          qr_code_updated_at: new Date().toISOString(),
-          connection_state: 'qr',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', instanceId);
-
-      return {
-        success: true,
-        qrCode,
-        message: 'QR Code atualizado com sucesso'
-      };
     } catch (error) {
       console.error('Error in refreshQRCode:', error);
       return {

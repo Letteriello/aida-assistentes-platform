@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import Cookies from 'js-cookie';
+import whatsappAuthClient, { AuthUser, PhoneVerificationRequest, VerifyCodeRequest } from '../whatsapp-auth';
 
 // Types
 export interface User {
   id: string;
-  email: string;
+  phone: string;
   name?: string;
+  businessId?: string;
   avatar?: string;
   plan?: 'starter' | 'professional' | 'enterprise';
   createdAt?: string;
@@ -20,29 +22,35 @@ export interface AuthState {
   error: string | null;
   
   // Dados de sessão
-  apiKey: string | null;
+  token: string | null;
   expiresAt: number | null;
+  
+  // WhatsApp Auth específico
+  pendingPhone: string | null;
+  verificationSent: boolean;
 }
 
 export interface AuthActions {
-  // Ações de autenticação
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, name?: string) => Promise<boolean>;
-  logout: () => void;
+  // Ações de autenticação WhatsApp
+  sendVerificationCode: (phoneNumber: string) => Promise<boolean>;
+  verifyCode: (phoneNumber: string, code: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   
   // Ações de estado
   setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  setPendingPhone: (phone: string | null) => void;
+  setVerificationSent: (sent: boolean) => void;
   
   // Verificação de sessão
   checkAuth: () => Promise<boolean>;
-  refreshToken: () => Promise<boolean>;
   
   // Utilitários
   isTokenExpired: () => boolean;
   getAuthHeaders: () => Record<string, string>;
+  validatePhone: (phone: string) => { isValid: boolean; formattedPhone: string; error?: string };
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -56,46 +64,32 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
-      apiKey: null,
+      token: null,
       expiresAt: null,
+      pendingPhone: null,
+      verificationSent: false,
 
-      // Ações de autenticação
-      login: async (email: string, password: string) => {
+      // Ações de autenticação WhatsApp
+      sendVerificationCode: async (phoneNumber: string) => {
         set({ isLoading: true, error: null });
         
         try {
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro no login');
-          }
-
-          const data = await response.json();
+          const result = await whatsappAuthClient.sendVerificationCode({ phoneNumber });
           
-          // Salvar no cookie (compatibilidade com middleware)
-          Cookies.set('aida_api_key', data.apiKey, {
-            expires: 7, // 7 dias
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-          });
-
-          // Atualizar estado
-          set({
-            user: data.user,
-            isAuthenticated: true,
-            isLoading: false,
-            apiKey: data.apiKey,
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 dias
-          });
-
-          return true;
+          if (result.success) {
+            set({
+              pendingPhone: phoneNumber,
+              verificationSent: true,
+              isLoading: false,
+            });
+            return true;
+          } else {
+            set({
+              error: result.message,
+              isLoading: false,
+            });
+            return false;
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Erro desconhecido',
@@ -105,42 +99,47 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      register: async (email: string, password: string, name?: string) => {
+      verifyCode: async (phoneNumber: string, code: string) => {
         set({ isLoading: true, error: null });
         
         try {
-          const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password, name }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro no registro');
-          }
-
-          const data = await response.json();
+          const result = await whatsappAuthClient.verifyCode({ phoneNumber, code });
           
-          // Salvar no cookie
-          Cookies.set('aida_api_key', data.apiKey, {
-            expires: 7,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-          });
+          if (result.success && result.token && result.user) {
+            // Salvar no cookie
+            Cookies.set('aida_auth_token', result.token, {
+              expires: 30, // 30 dias
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax'
+            });
 
-          // Atualizar estado
-          set({
-            user: data.user,
-            isAuthenticated: true,
-            isLoading: false,
-            apiKey: data.apiKey,
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000),
-          });
+            // Mapear AuthUser para User
+            const user: User = {
+              id: result.user.id,
+              phone: result.user.phone,
+              name: result.user.name,
+              businessId: result.user.businessId,
+            };
 
-          return true;
+            // Atualizar estado
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              token: result.token,
+              expiresAt: Date.now() + (30 * 24 * 60 * 60 * 1000), // 30 dias
+              pendingPhone: null,
+              verificationSent: false,
+            });
+
+            return true;
+          } else {
+            set({
+              error: result.message,
+              isLoading: false,
+            });
+            return false;
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Erro desconhecido',
@@ -150,9 +149,15 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      logout: () => {
+      logout: async () => {
+        try {
+          await whatsappAuthClient.logout();
+        } catch (error) {
+          console.warn('Erro no logout:', error);
+        }
+        
         // Remover cookie
-        Cookies.remove('aida_api_key');
+        Cookies.remove('aida_auth_token');
         
         // Limpar estado
         set({
@@ -160,8 +165,10 @@ export const useAuthStore = create<AuthStore>()(
           isAuthenticated: false,
           isLoading: false,
           error: null,
-          apiKey: null,
+          token: null,
           expiresAt: null,
+          pendingPhone: null,
+          verificationSent: false,
         });
       },
 
@@ -170,6 +177,8 @@ export const useAuthStore = create<AuthStore>()(
       setLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
       clearError: () => set({ error: null }),
+      setPendingPhone: (phone) => set({ pendingPhone: phone }),
+      setVerificationSent: (sent) => set({ verificationSent: sent }),
 
       // Verificação de sessão
       checkAuth: async () => {
@@ -179,7 +188,7 @@ export const useAuthStore = create<AuthStore>()(
         if (devBypass) {
           const mockUser: User = {
             id: 'mock-user-123',
-            email: 'teste@aida.com',
+            phone: '+5511999999999',
             name: 'Usuário de Teste',
             plan: 'professional',
             createdAt: new Date().toISOString(),
@@ -188,82 +197,50 @@ export const useAuthStore = create<AuthStore>()(
           set({
             user: mockUser,
             isAuthenticated: true,
-            apiKey: 'mock-api-key-123',
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000),
+            token: 'mock-token-123',
+            expiresAt: Date.now() + (30 * 24 * 60 * 60 * 1000),
           });
           
           return true;
         }
         
-        const apiKey = Cookies.get('aida_api_key');
+        const token = Cookies.get('aida_auth_token');
         
-        if (!apiKey) {
+        if (!token) {
           set({ isAuthenticated: false, user: null });
           return false;
         }
 
         try {
-          const response = await fetch('/api/auth/me', {
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-            },
-          });
+          // Definir token no cliente antes de fazer a requisição
+          whatsappAuthClient.clearAuth();
+          if (token) {
+            // Simular definir token no client (seria feito automaticamente na inicialização)
+            const result = await whatsappAuthClient.getCurrentUser();
+            
+            if (result.success && result.user) {
+              const user: User = {
+                id: result.user.id,
+                phone: result.user.phone,
+                name: result.user.name,
+                businessId: result.user.businessId,
+              };
+              
+              set({
+                user,
+                isAuthenticated: true,
+                token,
+                expiresAt: Date.now() + (30 * 24 * 60 * 60 * 1000),
+              });
 
-          if (!response.ok) {
-            throw new Error('Token inválido');
+              return true;
+            }
           }
-
-          const userData = await response.json();
           
-          set({
-            user: userData,
-            isAuthenticated: true,
-            apiKey,
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000),
-          });
-
-          return true;
+          throw new Error('Token inválido');
         } catch (error) {
           // Token inválido, fazer logout
-          get().logout();
-          return false;
-        }
-      },
-
-      refreshToken: async () => {
-        const { apiKey } = get();
-        
-        if (!apiKey) return false;
-
-        try {
-          const response = await fetch('/api/auth/refresh', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error('Falha ao renovar token');
-          }
-
-          const data = await response.json();
-          
-          // Atualizar cookie
-          Cookies.set('aida_api_key', data.apiKey, {
-            expires: 7,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-          });
-
-          set({
-            apiKey: data.apiKey,
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000),
-          });
-
-          return true;
-        } catch (error) {
-          get().logout();
+          await get().logout();
           return false;
         }
       },
@@ -275,8 +252,12 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       getAuthHeaders: (): Record<string, string> => {
-        const { apiKey } = get();
-        return apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {};
+        const { token } = get();
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
+      },
+
+      validatePhone: (phone: string) => {
+        return whatsappAuthClient.validateBrazilianPhone(phone);
       },
     }),
     {
@@ -286,8 +267,10 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-        apiKey: state.apiKey,
+        token: state.token,
         expiresAt: state.expiresAt,
+        pendingPhone: state.pendingPhone,
+        verificationSent: state.verificationSent,
       }),
     }
   )

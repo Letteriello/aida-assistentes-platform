@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/origin/card';
 import { Button } from '@/components/ui/origin/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckCircle, Phone, Building, MessageSquare, Zap } from 'lucide-react';
+import { CheckCircle, Phone, Building, MessageSquare, Zap, AlertCircle } from 'lucide-react';
+import { useAuthStore } from '@/lib/stores/auth-store';
+import { toast } from 'sonner';
 
 interface OnboardingData {
   phoneNumber: string;
@@ -19,7 +21,6 @@ interface OnboardingData {
 
 export function QuickOnboarding() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<OnboardingData>({
     phoneNumber: '',
     verificationCode: '',
@@ -27,6 +28,33 @@ export function QuickOnboarding() {
     businessType: '',
     whatsappConnected: false
   });
+
+  const {
+    sendVerificationCode,
+    verifyCode,
+    isLoading,
+    error,
+    verificationSent,
+    pendingPhone,
+    validatePhone,
+    clearError,
+    isAuthenticated
+  } = useAuthStore();
+
+  // Redirecionar se já autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = '/dashboard';
+    }
+  }, [isAuthenticated]);
+
+  // Mostrar erros como toast
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
   
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -55,19 +83,32 @@ export function QuickOnboarding() {
   };
 
   const handleSendCode = async () => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    nextStep();
+    // Validar telefone antes de enviar
+    const validation = validatePhone(data.phoneNumber);
+    if (!validation.isValid) {
+      toast.error(validation.error || 'Número de telefone inválido');
+      return;
+    }
+
+    const success = await sendVerificationCode(validation.formattedPhone);
+    if (success) {
+      setData(prev => ({ ...prev, phoneNumber: validation.formattedPhone }));
+      toast.success('Código enviado via WhatsApp!');
+      nextStep();
+    }
   };
 
   const handleVerifyCode = async () => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    nextStep();
+    if (!data.verificationCode || data.verificationCode.length !== 6) {
+      toast.error('Digite o código de 6 dígitos');
+      return;
+    }
+
+    const success = await verifyCode(data.phoneNumber, data.verificationCode);
+    if (success) {
+      toast.success('Verificação concluída!');
+      nextStep();
+    }
   };
 
   const handleBusinessSetup = async () => {
@@ -79,12 +120,8 @@ export function QuickOnboarding() {
   };
 
   const handleWhatsAppConnect = async () => {
-    setIsLoading(true);
-    // Simulate QR code scan and connection
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    setData(prev => ({ ...prev, whatsappConnected: true }));
-    setIsLoading(false);
-    // Would redirect to dashboard
+    // Redirect to dashboard where user can manage instances
+    window.location.href = '/dashboard';
   };
 
   return (
@@ -139,14 +176,34 @@ export function QuickOnboarding() {
                     id="phone"
                     placeholder="+55 11 99999-9999"
                     value={data.phoneNumber}
-                    onChange={(e) => setData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setData(prev => ({ ...prev, phoneNumber: value }));
+                    }}
                     className="text-center text-lg"
+                    maxLength={20}
                   />
+                  <p className="text-xs text-gray-500 text-center">
+                    Inclua o código do país (+55) e DDD
+                  </p>
+                  
+                  {data.phoneNumber && (() => {
+                    const validation = validatePhone(data.phoneNumber);
+                    if (!validation.isValid && data.phoneNumber.length > 5) {
+                      return (
+                        <div className="flex items-center gap-1 text-red-500 text-xs">
+                          <AlertCircle className="w-3 h-3" />
+                          {validation.error}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
                 
                 <Button 
                   onClick={handleSendCode}
-                  disabled={!data.phoneNumber || isLoading}
+                  disabled={!data.phoneNumber || isLoading || (data.phoneNumber && !validatePhone(data.phoneNumber).isValid)}
                   className="w-full"
                   variant="aida"
                   size="lg"
@@ -293,29 +350,24 @@ export function QuickOnboarding() {
                   )}
                 </div>
                 
-                {!data.whatsappConnected && (
-                  <div className="text-center">
-                    <div className="w-48 h-48 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                      {isLoading ? (
-                        <div className="animate-pulse">
-                          <div className="w-32 h-32 bg-gray-300 rounded-lg"></div>
-                        </div>
-                      ) : (
-                        <p className="text-gray-500">QR Code aqui</p>
-                      )}
+                <div className="text-center">
+                  <div className="w-48 h-48 bg-gradient-to-br from-aida-primary to-aida-secondary rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <MessageSquare className="w-16 h-16 mx-auto mb-2" />
+                      <p className="text-sm font-medium">WhatsApp Business</p>
+                      <p className="text-xs opacity-80">Pronto para conectar</p>
                     </div>
-                    
-                    <Button 
-                      onClick={handleWhatsAppConnect}
-                      disabled={isLoading}
-                      variant="aida"
-                      size="lg"
-                      className="w-full"
-                    >
-                      {isLoading ? 'Aguardando conexão...' : 'Gerar QR Code'}
-                    </Button>
                   </div>
-                )}
+                  
+                  <Button 
+                    onClick={handleWhatsAppConnect}
+                    variant="aida"
+                    size="lg"
+                    className="w-full"
+                  >
+                    Continuar para Dashboard
+                  </Button>
+                </div>
                 
                 {data.whatsappConnected && (
                   <Button 

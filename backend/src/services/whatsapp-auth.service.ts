@@ -1,531 +1,574 @@
-import { createClient } from '@supabase/supabase-js';
-import { EvolutionAPIClient } from '../evolution-api/client';
-import { Database } from '../../../shared/types/database';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { getEvolutionClient } from '../lib/evolution-client';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
-type SupabaseClient = ReturnType<typeof createClient<Database>>;
+export interface PhoneVerificationRequest {
+  phoneNumber: string;
+  countryCode?: string;
+}
 
-interface AuthCodeData {
-  id: string;
-  phone: string;
+export interface VerifyCodeRequest {
+  phoneNumber: string;
   code: string;
-  expires_at: string;
-  attempts: number;
-  max_attempts: number;
 }
 
-interface SendCodeResult {
+export interface AuthResponse {
   success: boolean;
   message: string;
-  expiresAt?: Date;
-  error?: string;
-}
-
-interface VerifyCodeResult {
-  success: boolean;
-  userId?: string;
   token?: string;
-  message: string;
-  error?: string;
+  user?: {
+    id: string;
+    phone: string;
+    name?: string;
+    businessId?: string;
+  };
+}
+
+export interface VerificationCode {
+  phone_number: string;
+  code: string;
+  expires_at: Date;
+  attempts: number;
+  created_at: Date;
 }
 
 export class WhatsAppAuthService {
   private supabase: SupabaseClient;
-  private evolutionClient: EvolutionAPIClient;
-  private adminInstanceId: string;
-  private codeExpirationMinutes: number = 10;
-  private maxAttempts: number = 3;
-  private rateLimitMinutes: number = 1; // Minimum time between code requests
+  private evolutionClient;
+  private adminInstanceName: string | null = null;
+  
+  // Configurações
+  private readonly CODE_LENGTH = 6;
+  private readonly CODE_EXPIRY_MINUTES = 15;
+  private readonly MAX_ATTEMPTS = 3;
+  private readonly RATE_LIMIT_WINDOW = 60; // 60 segundos
+  private readonly MAX_CODES_PER_WINDOW = 3;
 
-  constructor(
-    supabase: SupabaseClient,
-    evolutionClient: EvolutionAPIClient,
-    adminInstanceId: string
-  ) {
+  constructor(supabase: SupabaseClient) {
     this.supabase = supabase;
-    this.evolutionClient = evolutionClient;
-    this.adminInstanceId = adminInstanceId;
+    this.evolutionClient = getEvolutionClient();
+    this.initializeAdminInstance();
   }
 
   /**
-   * Send authentication code via WhatsApp
+   * Inicializar instância administrativa para envio de códigos
    */
-  async sendAuthCode(
-    phone: string,
-    ipAddress?: string,
-    userAgent?: string
-  ): Promise<SendCodeResult> {
+  private async initializeAdminInstance(): Promise<void> {
     try {
-      // Validate phone format (Brazilian numbers)
-      if (!this.isValidBrazilianPhone(phone)) {
+      // Verificar se já existe uma instância admin ativa
+      const { data: existingInstance } = await this.supabase
+        .from('admin_instances')
+        .select('instance_name, status')
+        .eq('status', 'active')
+        .single();
+
+      if (existingInstance) {
+        // Verificar se a instância ainda está conectada
+        const isConnected = await this.evolutionClient.isInstanceConnected(existingInstance.instance_name);
+        
+        if (isConnected) {
+          this.adminInstanceName = existingInstance.instance_name;
+          console.log('Using existing admin instance:', this.adminInstanceName);
+          return;
+        } else {
+          // Marcar instância como inativa
+          await this.supabase
+            .from('admin_instances')
+            .update({ status: 'inactive' })
+            .eq('instance_name', existingInstance.instance_name);
+        }
+      }
+
+      // Criar nova instância admin
+      await this.createNewAdminInstance();
+      
+    } catch (error) {
+      console.error('Error initializing admin instance:', error);
+    }
+  }
+
+  /**
+   * Criar nova instância administrativa
+   */
+  private async createNewAdminInstance(): Promise<void> {
+    try {
+      const adminInstanceName = `aida_admin_${Date.now()}`;
+      
+      const webhookUrl = `${process.env.APP_URL}/api/webhook/admin`;
+      
+      const instance = await this.evolutionClient.createInstance({
+        instanceName: adminInstanceName,
+        qrcode: true,
+        webhook: {
+          url: webhookUrl,
+          events: ['MESSAGES_UPSERT', 'CONNECTION_UPDATE']
+        }
+      });
+
+      // Salvar no banco
+      await this.supabase.from('admin_instances').insert({
+        instance_name: adminInstanceName,
+        status: 'pending',
+        qr_code: instance.qrcode?.base64,
+        created_at: new Date()
+      });
+
+      this.adminInstanceName = adminInstanceName;
+      console.log('Created new admin instance:', adminInstanceName);
+      
+    } catch (error) {
+      console.error('Error creating admin instance:', error);
+      throw new Error('Failed to initialize WhatsApp admin instance');
+    }
+  }
+
+  /**
+   * Validar número de telefone brasileiro
+   */
+  private validateBrazilianPhone(phoneNumber: string): { isValid: boolean; formattedPhone: string; error?: string } {
+    // Remover caracteres não numéricos
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    
+    // Verificar se é um número brasileiro válido
+    if (cleanPhone.length === 11 && cleanPhone.startsWith('55')) {
+      // Com código do país
+      const phone = cleanPhone;
+      const ddd = phone.substring(2, 4);
+      const number = phone.substring(4);
+      
+      // Validar DDD
+      const validDDDs = [
+        '11', '12', '13', '14', '15', '16', '17', '18', '19', // SP
+        '21', '22', '24', // RJ
+        '27', '28', // ES
+        '31', '32', '33', '34', '35', '37', '38', // MG
+        '41', '42', '43', '44', '45', '46', // PR
+        '47', '48', '49', // SC
+        '51', '53', '54', '55', // RS
+        '61', // DF
+        '62', '64', // GO
+        '63', // TO
+        '65', '66', // MT
+        '67', // MS
+        '68', // AC
+        '69', // RO
+        '71', '73', '74', '75', '77', // BA
+        '79', // SE
+        '81', '87', // PE
+        '82', // AL
+        '83', // PB
+        '84', // RN
+        '85', '88', // CE
+        '86', '89', // PI
+        '91', '93', '94', // PA
+        '92', '97', // AM
+        '95', // RR
+        '96', // AP
+        '98', '99' // MA
+      ];
+      
+      if (!validDDDs.includes(ddd)) {
+        return { isValid: false, formattedPhone: '', error: 'DDD inválido' };
+      }
+      
+      // Validar formato do número (celular deve ter 9 dígitos)
+      if (number.length === 9 && number.startsWith('9')) {
+        return { isValid: true, formattedPhone: phone };
+      } else if (number.length === 8) {
+        return { isValid: false, formattedPhone: '', error: 'Número deve ser um celular (9 dígitos)' };
+      }
+      
+      return { isValid: false, formattedPhone: '', error: 'Formato de número inválido' };
+      
+    } else if (cleanPhone.length === 9 || cleanPhone.length === 10) {
+      // Sem código do país, assumir Brasil
+      return { isValid: false, formattedPhone: '', error: 'Inclua o código do país +55' };
+      
+    } else {
+      return { isValid: false, formattedPhone: '', error: 'Número de telefone inválido' };
+    }
+  }
+
+  /**
+   * Verificar rate limiting
+   */
+  private async checkRateLimit(phoneNumber: string): Promise<{ allowed: boolean; error?: string }> {
+    const windowStart = new Date(Date.now() - (this.RATE_LIMIT_WINDOW * 1000));
+    
+    const { data: recentCodes, error } = await this.supabase
+      .from('auth_codes')
+      .select('phone')
+      .eq('phone', phoneNumber)
+      .gte('created_at', windowStart.toISOString());
+
+    if (error) {
+      console.error('Error checking rate limit:', error);
+      return { allowed: false, error: 'Erro interno do servidor' };
+    }
+
+    if (recentCodes && recentCodes.length >= this.MAX_CODES_PER_WINDOW) {
+      return { 
+        allowed: false, 
+        error: `Muitas tentativas. Aguarde ${this.RATE_LIMIT_WINDOW} segundos antes de tentar novamente.` 
+      };
+    }
+
+    return { allowed: true };
+  }
+
+  /**
+   * Gerar código de verificação
+   */
+  private generateVerificationCode(): string {
+    return crypto.randomInt(100000, 999999).toString();
+  }
+
+  /**
+   * Enviar código de verificação via WhatsApp
+   */
+  async sendVerificationCode(request: PhoneVerificationRequest): Promise<AuthResponse> {
+    try {
+      // 1. Validar número de telefone
+      const validation = this.validateBrazilianPhone(request.phoneNumber);
+      if (!validation.isValid) {
         return {
           success: false,
-          message: 'Número de telefone inválido. Use o formato +5511999999999'
+          message: validation.error || 'Número de telefone inválido'
         };
       }
 
-      // Check rate limiting
-      const rateLimitCheck = await this.checkRateLimit(phone);
+      const phoneNumber = validation.formattedPhone;
+
+      // 2. Verificar rate limiting
+      const rateLimitCheck = await this.checkRateLimit(phoneNumber);
       if (!rateLimitCheck.allowed) {
         return {
           success: false,
-          message: `Aguarde ${rateLimitCheck.waitMinutes} minuto(s) antes de solicitar um novo código`
+          message: rateLimitCheck.error || 'Muitas tentativas'
         };
       }
 
-      // Generate 6-digit code
-      const code = this.generateAuthCode();
-      const expiresAt = new Date(Date.now() + this.codeExpirationMinutes * 60 * 1000);
+      // 3. Verificar se admin instance está disponível
+      if (!this.adminInstanceName) {
+        await this.initializeAdminInstance();
+      }
 
-      // Store code in database
+      if (!this.adminInstanceName) {
+        return {
+          success: false,
+          message: 'Serviço temporariamente indisponível. Tente novamente em alguns minutos.'
+        };
+      }
+
+      // 4. Verificar se admin instance está conectada
+      const isConnected = await this.evolutionClient.isInstanceConnected(this.adminInstanceName);
+      if (!isConnected) {
+        return {
+          success: false,
+          message: 'Sistema WhatsApp temporariamente indisponível. Tente novamente em alguns minutos.'
+        };
+      }
+
+      // 5. Gerar código
+      const code = this.generateVerificationCode();
+      const expiresAt = new Date(Date.now() + (this.CODE_EXPIRY_MINUTES * 60 * 1000));
+
+      // 6. Salvar código no banco
       const { error: dbError } = await this.supabase
         .from('auth_codes')
-        .insert({
-          phone,
-          code,
+        .upsert({
+          phone: phoneNumber,
+          code: code,
           expires_at: expiresAt.toISOString(),
           attempts: 0,
-          max_attempts: this.maxAttempts,
-          ip_address: ipAddress,
-          user_agent: userAgent
+          created_at: new Date().toISOString()
+        }, {
+          onConflict: 'phone'
         });
 
       if (dbError) {
-        console.error('Error storing auth code:', dbError);
+        console.error('Error saving verification code:', dbError);
         return {
           success: false,
-          message: 'Erro interno. Tente novamente.'
+          message: 'Erro interno do servidor'
         };
       }
 
-      // Send code via WhatsApp
-      const message = this.formatAuthMessage(code);
-      const sendResult = await this.sendWhatsAppMessage(phone, message);
+      // 7. Enviar código via WhatsApp
+      const message = `🤖 *AIDA Assistentes*
 
-      if (!sendResult.success) {
-        // Clean up stored code if sending failed
+Seu código de verificação é: *${code}*
+
+⏰ Este código expira em ${this.CODE_EXPIRY_MINUTES} minutos.
+🔒 Não compartilhe este código com ninguém.
+
+Se você não solicitou este código, ignore esta mensagem.`;
+
+      try {
+        await this.evolutionClient.sendTextMessage(this.adminInstanceName, {
+          number: phoneNumber,
+          text: message
+        });
+
+        return {
+          success: true,
+          message: `Código enviado para WhatsApp +${phoneNumber}. Verifique suas mensagens.`
+        };
+
+      } catch (whatsappError) {
+        console.error('Error sending WhatsApp message:', whatsappError);
+        
+        // Remover código do banco se falha no envio
         await this.supabase
           .from('auth_codes')
           .delete()
-          .eq('phone', phone)
-          .eq('code', code);
+          .eq('phone', phoneNumber);
 
         return {
           success: false,
-          message: 'Erro ao enviar código. Verifique se o número está correto.'
+          message: 'Erro ao enviar código via WhatsApp. Verifique se o número está correto.'
         };
       }
 
-      return {
-        success: true,
-        message: 'Código enviado com sucesso!',
-        expiresAt
-      };
-
     } catch (error) {
-      console.error('Error in sendAuthCode:', error);
+      console.error('Error in sendVerificationCode:', error);
       return {
         success: false,
-        message: 'Erro interno. Tente novamente.',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        message: 'Erro interno do servidor'
       };
     }
   }
 
   /**
-   * Verify authentication code and create/login user
+   * Verificar código de verificação
    */
-  async verifyAuthCode(
-    phone: string,
-    code: string,
-    ipAddress?: string
-  ): Promise<VerifyCodeResult> {
+  async verifyCode(request: VerifyCodeRequest): Promise<AuthResponse> {
     try {
-      // Find valid code
-      const { data: authCodes, error: findError } = await this.supabase
+      // 1. Validar número de telefone
+      const validation = this.validateBrazilianPhone(request.phoneNumber);
+      if (!validation.isValid) {
+        return {
+          success: false,
+          message: validation.error || 'Número de telefone inválido'
+        };
+      }
+
+      const phoneNumber = validation.formattedPhone;
+
+      // 2. Buscar código no banco
+      const { data: codeData, error: fetchError } = await this.supabase
         .from('auth_codes')
         .select('*')
-        .eq('phone', phone)
-        .eq('code', code)
-        .is('used_at', null)
-        .gt('expires_at', new Date().toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1);
+        .eq('phone', phoneNumber)
+        .single();
 
-      if (findError) {
-        console.error('Error finding auth code:', findError);
+      if (fetchError || !codeData) {
         return {
           success: false,
-          message: 'Erro interno. Tente novamente.'
+          message: 'Código não encontrado. Solicite um novo código.'
         };
       }
 
-      if (!authCodes || authCodes.length === 0) {
-        // Check if code exists but is expired/used
-        const { data: expiredCodes } = await this.supabase
+      // 3. Verificar se código expirou
+      if (new Date() > new Date(codeData.expires_at)) {
+        // Remover código expirado
+        await this.supabase
           .from('auth_codes')
-          .select('*')
-          .eq('phone', phone)
-          .eq('code', code)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (expiredCodes && expiredCodes.length > 0) {
-          return {
-            success: false,
-            message: 'Código expirado ou já utilizado. Solicite um novo código.'
-          };
-        }
-
-        // Increment attempts for any active codes for this phone
-        await this.incrementFailedAttempts(phone);
+          .delete()
+          .eq('phone', phoneNumber);
 
         return {
           success: false,
-          message: 'Código inválido. Verifique e tente novamente.'
+          message: 'Código expirado. Solicite um novo código.'
         };
       }
 
-      const authCode = authCodes[0] as AuthCodeData;
+      // 4. Verificar tentativas
+      if (codeData.attempts >= this.MAX_ATTEMPTS) {
+        // Remover código após muitas tentativas
+        await this.supabase
+          .from('auth_codes')
+          .delete()
+          .eq('phone', phoneNumber);
 
-      // Check max attempts
-      if (authCode.attempts >= authCode.max_attempts) {
         return {
           success: false,
-          message: 'Muitas tentativas. Solicite um novo código.'
+          message: 'Muitas tentativas incorretas. Solicite um novo código.'
         };
       }
 
-      // Mark code as used
-      const { error: updateError } = await this.supabase
-        .from('auth_codes')
-        .update({ used_at: new Date().toISOString() })
-        .eq('id', authCode.id);
+      // 5. Verificar código
+      if (codeData.code !== request.code) {
+        // Incrementar tentativas
+        await this.supabase
+          .from('auth_codes')
+          .update({ attempts: codeData.attempts + 1 })
+          .eq('phone', phoneNumber);
 
-      if (updateError) {
-        console.error('Error updating auth code:', updateError);
+        const remainingAttempts = this.MAX_ATTEMPTS - (codeData.attempts + 1);
         return {
           success: false,
-          message: 'Erro interno. Tente novamente.'
+          message: `Código incorreto. ${remainingAttempts} tentativa(s) restante(s).`
         };
       }
 
-      // Create or get user
-      const userResult = await this.createOrGetUser(phone);
-      if (!userResult.success) {
-        return {
-          success: false,
-          message: userResult.message
-        };
-      }
-
-      // Generate JWT token (simplified - in production use proper JWT library)
-      const token = await this.generateUserToken(userResult.userId!, phone);
-
-      // Update user last login
+      // 6. Código correto - remover do banco
       await this.supabase
-        .from('users_simplified')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', userResult.userId);
+        .from('auth_codes')
+        .delete()
+        .eq('phone', phoneNumber);
+
+      // 7. Buscar ou criar usuário
+      let user = await this.findOrCreateUser(phoneNumber);
+
+      // 8. Gerar token JWT
+      const token = this.generateJWT(user);
 
       return {
         success: true,
-        userId: userResult.userId,
+        message: 'Login realizado com sucesso!',
         token,
-        message: 'Login realizado com sucesso!'
+        user: {
+          id: user.id,
+          phone: user.phone,
+          name: user.name,
+          businessId: null // Will be set later during onboarding
+        }
       };
 
     } catch (error) {
-      console.error('Error in verifyAuthCode:', error);
+      console.error('Error in verifyCode:', error);
       return {
         success: false,
-        message: 'Erro interno. Tente novamente.',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        message: 'Erro interno do servidor'
       };
     }
   }
 
   /**
-   * Clean up expired auth codes
+   * Encontrar ou criar usuário
    */
-  async cleanupExpiredCodes(): Promise<number> {
-    try {
-      const { data, error } = await this.supabase
-        .rpc('cleanup_expired_auth_codes');
+  private async findOrCreateUser(phoneNumber: string): Promise<any> {
+    // Buscar usuário existente
+    let { data: user, error } = await this.supabase
+      .from('users_simplified')
+      .select('*')
+      .eq('phone', phoneNumber)
+      .single();
 
-      if (error) {
-        console.error('Error cleaning up expired codes:', error);
-        return 0;
-      }
-
-      return data || 0;
-    } catch (error) {
-      console.error('Error in cleanupExpiredCodes:', error);
-      return 0;
+    if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+      throw error;
     }
-  }
 
-  /**
-   * Check if admin instance is connected and ready
-   */
-  async checkAdminInstanceStatus(): Promise<{ connected: boolean; message: string }> {
-    try {
-      const status = await this.evolutionClient.getInstanceStatus(this.adminInstanceId);
-      
-      if (status.success && status.data?.instance?.state === 'open') {
-        return {
-          connected: true,
-          message: 'Admin instance is connected and ready'
-        };
-      }
-
-      return {
-        connected: false,
-        message: 'Admin instance is not connected. Please scan QR code.'
-      };
-    } catch (error) {
-      console.error('Error checking admin instance status:', error);
-      return {
-        connected: false,
-        message: 'Error checking admin instance status'
-      };
-    }
-  }
-
-  // Private helper methods
-
-  private isValidBrazilianPhone(phone: string): boolean {
-    // Brazilian phone format: +55 + area code (2 digits) + number (8 or 9 digits)
-    const brazilianPhoneRegex = /^\+55[1-9][0-9]{8,9}$/;
-    return brazilianPhoneRegex.test(phone);
-  }
-
-  private generateAuthCode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-
-  private formatAuthMessage(code: string): string {
-    return `🔐 *AIDA Platform*\n\nSeu código de autenticação é: *${code}*\n\nEste código expira em ${this.codeExpirationMinutes} minutos.\n\n⚠️ Não compartilhe este código com ninguém.`;
-  }
-
-  private async sendWhatsAppMessage(phone: string, message: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      // Format phone for WhatsApp (remove + and add @s.whatsapp.net)
-      const whatsappNumber = phone.replace('+', '') + '@s.whatsapp.net';
-
-      const result = await this.evolutionClient.sendMessage(this.adminInstanceId, {
-        number: whatsappNumber,
-        text: message
-      });
-
-      return {
-        success: result.success
-      };
-    } catch (error) {
-      console.error('Error sending WhatsApp message:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  private async checkRateLimit(phone: string): Promise<{ allowed: boolean; waitMinutes?: number }> {
-    try {
-      const { data: recentCodes, error } = await this.supabase
-        .from('auth_codes')
-        .select('created_at')
-        .eq('phone', phone)
-        .gte('created_at', new Date(Date.now() - this.rateLimitMinutes * 60 * 1000).toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        console.error('Error checking rate limit:', error);
-        return { allowed: true }; // Allow on error to not block users
-      }
-
-      if (recentCodes && recentCodes.length > 0) {
-        const lastCodeTime = new Date(recentCodes[0].created_at);
-        const timeDiff = Date.now() - lastCodeTime.getTime();
-        const minutesDiff = Math.ceil(timeDiff / (1000 * 60));
-        
-        if (minutesDiff < this.rateLimitMinutes) {
-          return {
-            allowed: false,
-            waitMinutes: this.rateLimitMinutes - minutesDiff
-          };
-        }
-      }
-
-      return { allowed: true };
-    } catch (error) {
-      console.error('Error in checkRateLimit:', error);
-      return { allowed: true }; // Allow on error
-    }
-  }
-
-  private async incrementFailedAttempts(phone: string): Promise<void> {
-    try {
-      // Get active codes for this phone
-      const { data: activeCodes } = await this.supabase
-        .from('auth_codes')
-        .select('id, attempts')
-        .eq('phone', phone)
-        .is('used_at', null)
-        .gt('expires_at', new Date().toISOString());
-
-      if (activeCodes && activeCodes.length > 0) {
-        // Increment attempts for all active codes
-        for (const code of activeCodes) {
-          await this.supabase
-            .from('auth_codes')
-            .update({ attempts: code.attempts + 1 })
-            .eq('id', code.id);
-        }
-      }
-    } catch (error) {
-      console.error('Error incrementing failed attempts:', error);
-    }
-  }
-
-  private async createOrGetUser(phone: string): Promise<{ success: boolean; userId?: string; message: string }> {
-    try {
-      // Try to find existing user
-      const { data: existingUser, error: findError } = await this.supabase
-        .from('users_simplified')
-        .select('id')
-        .eq('phone', phone)
-        .single();
-
-      if (findError && findError.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error finding user:', findError);
-        return {
-          success: false,
-          message: 'Erro interno. Tente novamente.'
-        };
-      }
-
-      if (existingUser) {
-        return {
-          success: true,
-          userId: existingUser.id,
-          message: 'User found'
-        };
-      }
-
-      // Create new user
+    if (!user) {
+      // Criar novo usuário
       const { data: newUser, error: createError } = await this.supabase
         .from('users_simplified')
-        .insert({ phone })
-        .select('id')
+        .insert({
+          phone: phoneNumber,
+          name: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
         .single();
 
       if (createError) {
-        console.error('Error creating user:', createError);
-        return {
-          success: false,
-          message: 'Erro ao criar usuário. Tente novamente.'
-        };
+        throw createError;
       }
 
-      return {
-        success: true,
-        userId: newUser.id,
-        message: 'User created'
-      };
-    } catch (error) {
-      console.error('Error in createOrGetUser:', error);
-      return {
-        success: false,
-        message: 'Erro interno. Tente novamente.'
-      };
+      user = newUser;
+    } else {
+      // Atualizar último acesso
+      await this.supabase
+        .from('users_simplified')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', user.id);
     }
+
+    return user;
   }
 
-  private async generateUserToken(userId: string, phone: string): Promise<string> {
-    // In production, use a proper JWT library like jsonwebtoken
-    // For now, create a simple token structure
+  /**
+   * Gerar JWT token
+   */
+  private generateJWT(user: any): string {
     const payload = {
-      sub: userId,
-      phone,
+      userId: user.id,
+      phone: user.phone,
+      businessId: null, // Will be set later during onboarding
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+      exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 dias
     };
 
-    // This is a simplified token - in production use proper JWT signing
-    return Buffer.from(JSON.stringify(payload)).toString('base64');
+    return jwt.sign(payload, process.env.JWT_SECRET || 'aida-secret-key');
   }
 
   /**
-   * Validate and decode user token
+   * Verificar token JWT
    */
-  static validateToken(token: string): { valid: boolean; userId?: string; phone?: string } {
+  static verifyJWT(token: string): any {
     try {
-      const payload = JSON.parse(Buffer.from(token, 'base64').toString());
-      
-      if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-        return { valid: false }; // Token expired
-      }
-
-      return {
-        valid: true,
-        userId: payload.sub,
-        phone: payload.phone
-      };
+      return jwt.verify(token, process.env.JWT_SECRET || 'aida-secret-key');
     } catch (error) {
-      return { valid: false };
+      return null;
     }
   }
 
   /**
-   * Setup admin instance for authentication
+   * Middleware de autenticação
    */
-  static async setupAdminInstance(
-    evolutionClient: EvolutionAPIClient,
-    instanceName: string = 'aida-auth-admin'
-  ): Promise<{ success: boolean; instanceId?: string; qrCode?: string; message: string }> {
-    try {
-      // Create admin instance
-      const createResult = await evolutionClient.createInstance({
-        instanceName,
-        qrcode: true,
-        integration: 'WHATSAPP-BAILEYS'
-      });
-
-      if (!createResult.success) {
-        return {
-          success: false,
-          message: 'Failed to create admin instance'
-        };
+  static authMiddleware() {
+    return (req: any, res: any, next: any) => {
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Token de acesso requerido' });
       }
 
-      // Get QR code for connection
-      const qrResult = await evolutionClient.getInstanceQRCode(instanceName);
+      const token = authHeader.substring(7);
+      const decoded = WhatsAppAuthService.verifyJWT(token);
+
+      if (!decoded) {
+        return res.status(401).json({ error: 'Token inválido ou expirado' });
+      }
+
+      req.user = decoded;
+      next();
+    };
+  }
+
+  /**
+   * Obter QR Code da instância admin (para primeiras configurações)
+   */
+  async getAdminQRCode(): Promise<{ qrCode?: string; isConnected: boolean }> {
+    try {
+      if (!this.adminInstanceName) {
+        await this.initializeAdminInstance();
+      }
+
+      if (!this.adminInstanceName) {
+        return { isConnected: false };
+      }
+
+      const isConnected = await this.evolutionClient.isInstanceConnected(this.adminInstanceName);
+      
+      if (isConnected) {
+        return { isConnected: true };
+      }
+
+      // Tentar reconectar e obter QR code
+      const connection = await this.evolutionClient.connectInstance(this.adminInstanceName);
       
       return {
-        success: true,
-        instanceId: instanceName,
-        qrCode: qrResult.data?.qrcode?.base64,
-        message: 'Admin instance created. Please scan QR code to connect.'
+        qrCode: connection.qrcode.base64,
+        isConnected: false
       };
+
     } catch (error) {
-      console.error('Error setting up admin instance:', error);
-      return {
-        success: false,
-        message: 'Error setting up admin instance'
-      };
+      console.error('Error getting admin QR code:', error);
+      return { isConnected: false };
     }
   }
 }
-
-// Factory function
-export function createWhatsAppAuthService(
-  supabase: SupabaseClient,
-  evolutionClient: EvolutionAPIClient,
-  adminInstanceId: string
-): WhatsAppAuthService {
-  return new WhatsAppAuthService(supabase, evolutionClient, adminInstanceId);
-}
-
-// Export types
-export type { SendCodeResult, VerifyCodeResult, AuthCodeData };
