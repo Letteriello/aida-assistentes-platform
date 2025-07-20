@@ -1,31 +1,34 @@
 "use client"
 
 import * as React from "react"
-import * as SwitchPrimitives from "@radix-ui/react-switch"
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
+import { Check, Minus } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
-// Switch variants for consistent styling
-const switchVariants = cva(
+// Checkbox variants for consistent styling
+const checkboxVariants = cva(
   [
     // Base styles
-    "peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent",
-    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-    "focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+    "peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow transition-all duration-200",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+    "disabled:cursor-not-allowed disabled:opacity-50",
+    "data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+    "data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground"
   ],
   {
     variants: {
       size: {
-        sm: "h-4 w-7",
-        md: "h-6 w-11",
-        lg: "h-8 w-14"
+        sm: "h-3 w-3",
+        md: "h-4 w-4", 
+        lg: "h-5 w-5"
       },
       variant: {
-        default: "data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
-        destructive: "data-[state=checked]:bg-destructive data-[state=unchecked]:bg-input",
-        success: "data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-input",
-        warning: "data-[state=checked]:bg-yellow-500 data-[state=unchecked]:bg-input"
+        default: "border-primary",
+        destructive: "border-destructive data-[state=checked]:bg-destructive",
+        success: "border-green-500 data-[state=checked]:bg-green-500",
+        warning: "border-yellow-500 data-[state=checked]:bg-yellow-500"
       }
     },
     defaultVariants: {
@@ -35,55 +38,49 @@ const switchVariants = cva(
   }
 )
 
-const switchThumbVariants = cva(
-  [
-    "pointer-events-none block rounded-full bg-background shadow-lg ring-0 transition-transform duration-200"
-  ],
-  {
-    variants: {
-      size: {
-        sm: "h-3 w-3 data-[state=checked]:translate-x-3 data-[state=unchecked]:translate-x-0",
-        md: "h-5 w-5 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
-        lg: "h-7 w-7 data-[state=checked]:translate-x-6 data-[state=unchecked]:translate-x-0"
-      }
-    },
-    defaultVariants: {
-      size: "md"
-    }
-  }
-)
-
-const Switch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> &
-    VariantProps<typeof switchVariants>
+const Checkbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & 
+    VariantProps<typeof checkboxVariants>
 >(({ className, size, variant, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(switchVariants({ size, variant }), className)}
-    {...props}
+  <CheckboxPrimitive.Root
     ref={ref}
+    className={cn(checkboxVariants({ size, variant }), className)}
+    {...props}
   >
-    <SwitchPrimitives.Thumb
-      className={cn(switchThumbVariants({ size }))}
-    />
-  </SwitchPrimitives.Root>
+    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current">
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0, opacity: 0 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+      >
+        <Check className={cn(
+          "h-3 w-3",
+          size === "sm" && "h-2 w-2",
+          size === "lg" && "h-4 w-4"
+        )} />
+      </motion.div>
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
 ))
-Switch.displayName = SwitchPrimitives.Root.displayName
+Checkbox.displayName = CheckboxPrimitive.Root.displayName
 
-// Enhanced switch with form features
-interface EnhancedSwitchProps 
-  extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
-    VariantProps<typeof switchVariants> {
+// Enhanced checkbox with label and form features
+interface EnhancedCheckboxProps 
+  extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>,
+    VariantProps<typeof checkboxVariants> {
   label?: string
   description?: string
   helperText?: string
   errorMessage?: string
   required?: boolean
+  indeterminate?: boolean
 }
 
-const EnhancedSwitch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  EnhancedSwitchProps
+const EnhancedCheckbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  EnhancedCheckboxProps
 >(({ 
   className,
   label,
@@ -91,6 +88,7 @@ const EnhancedSwitch = React.forwardRef<
   helperText,
   errorMessage,
   required,
+  indeterminate,
   size,
   variant,
   id,
@@ -100,12 +98,12 @@ const EnhancedSwitch = React.forwardRef<
   "aria-describedby": ariaDescribedBy,
   ...props 
 }, ref) => {
-  const switchId = React.useId()
+  const checkboxId = React.useId()
   const helperTextId = React.useId()
   const errorId = React.useId()
   const descriptionId = React.useId()
   
-  const finalId = id || switchId
+  const finalId = id || checkboxId
   const hasError = !!errorMessage
   const finalVariant = hasError ? "destructive" : variant
   
@@ -131,13 +129,20 @@ const EnhancedSwitch = React.forwardRef<
     },
   }
   
-  const switchElement = (
-    <Switch
+  // Handle indeterminate state
+  React.useEffect(() => {
+    if (ref && typeof ref === 'object' && ref.current) {
+      ref.current.indeterminate = !!indeterminate
+    }
+  }, [indeterminate, ref])
+  
+  const checkboxElement = (
+    <Checkbox
       ref={ref}
       id={finalId}
       size={size}
       variant={finalVariant}
-      checked={checked}
+      checked={indeterminate ? "indeterminate" : checked}
       onCheckedChange={onCheckedChange}
       disabled={disabled}
       aria-invalid={hasError}
@@ -147,16 +152,16 @@ const EnhancedSwitch = React.forwardRef<
     />
   )
   
-  // Simple switch without label
+  // Simple checkbox without label
   if (!label && !description && !helperText && !errorMessage) {
-    return switchElement
+    return checkboxElement
   }
   
-  // Enhanced switch with label and form features
+  // Enhanced checkbox with label and form features
   return (
     <div className="space-y-1">
       <div className="flex items-start space-x-2">
-        {switchElement}
+        {checkboxElement}
         <div className="grid gap-1.5 leading-none">
           {label && (
             <label
@@ -182,7 +187,7 @@ const EnhancedSwitch = React.forwardRef<
         {errorMessage && (
           <motion.p
             id={errorId}
-            className="text-xs text-destructive font-medium ml-8"
+            className="text-xs text-destructive font-medium ml-6"
             variants={errorVariants}
             initial="hidden"
             animate="visible"
@@ -195,7 +200,7 @@ const EnhancedSwitch = React.forwardRef<
         {helperText && !errorMessage && (
           <motion.p
             id={helperTextId}
-            className="text-xs text-muted-foreground ml-8"
+            className="text-xs text-muted-foreground ml-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -209,6 +214,6 @@ const EnhancedSwitch = React.forwardRef<
   )
 })
 
-EnhancedSwitch.displayName = "EnhancedSwitch"
+EnhancedCheckbox.displayName = "EnhancedCheckbox"
 
-export { Switch, EnhancedSwitch, switchVariants }
+export { Checkbox, EnhancedCheckbox, checkboxVariants }

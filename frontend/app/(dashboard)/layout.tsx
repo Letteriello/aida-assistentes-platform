@@ -43,7 +43,7 @@ const navigation: NavigationItem[] = [
     name: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
-    description: 'Visão geral e métricas'
+    description: 'Visao geral e metricas'
   },
   {
     name: 'Assistentes',
@@ -61,13 +61,13 @@ const navigation: NavigationItem[] = [
     name: 'Conversas',
     href: '/conversations',
     icon: MessageSquare,
-    description: 'Histórico de conversas'
+    description: 'Historico de conversas'
   },
   {
-    name: 'Configurações',
+    name: 'Configuracoes',
     href: '/settings',
     icon: Settings,
-    description: 'Configurações da conta'
+    description: 'Configuracoes da conta'
   }
 ];
 
@@ -197,7 +197,7 @@ export default function DashboardLayout({
               {(!sidebarCollapsed || mobile) && (
                 <div className="flex flex-col items-start text-left min-w-0">
                   <span className="text-sm font-medium text-sidebar-foreground truncate">
-                    {user?.name || 'Usuário'}
+                    {user?.name || 'Usuario'}
                   </span>
                   <span className="text-xs text-sidebar-foreground/60 truncate">
                     {user?.email || 'email@exemplo.com'}
@@ -213,7 +213,7 @@ export default function DashboardLayout({
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              Configurações
+              Configuracoes
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

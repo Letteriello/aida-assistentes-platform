@@ -1,6 +1,6 @@
 /**
  * AIDA Assistentes - WhatsApp Connectivity Page
- * Página de conectividade WhatsApp com Baileys e Cloud API
+ * Pagina de conectividade WhatsApp com Baileys e Cloud API
  * PATTERN: Multi-tab interface with real-time connection management
  */
 
@@ -198,7 +198,7 @@ function WhatsAppPage() {
               WhatsApp Connectivity
             </h1>
             <p className="text-muted-foreground mt-2">
-              Gerencie conexões WhatsApp, integrações e automações
+              Gerencie conexoes WhatsApp, integracoes e automacoes
             </p>
           </div>
           
@@ -241,7 +241,7 @@ function WhatsAppPage() {
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="connection" className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
-              Conexão
+              Conexao
             </TabsTrigger>
             <TabsTrigger value="messages" className="flex items-center gap-2">
               <Send className="h-4 w-4" />
@@ -249,11 +249,11 @@ function WhatsAppPage() {
             </TabsTrigger>
             <TabsTrigger value="integrations" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
-              Integrações
+              Integracoes
             </TabsTrigger>
             <TabsTrigger value="automations" className="flex items-center gap-2">
               <Zap className="h-4 w-4" />
-              Automações
+              Automacoes
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -272,7 +272,7 @@ function WhatsAppPage() {
                     Baileys (WhatsApp Web)
                   </TechCardTitle>
                   <TechCardDescription>
-                    Conexão direta via WhatsApp Web com QR Code
+                    Conexao direta via WhatsApp Web com QR Code
                   </TechCardDescription>
                 </TechCardHeader>
                 <TechCardContent className="space-y-4">
@@ -317,7 +317,7 @@ function WhatsAppPage() {
                     Cloud API
                   </TechCardTitle>
                   <TechCardDescription>
-                    Conexão via WhatsApp Business API oficial
+                    Conexao via WhatsApp Business API oficial
                   </TechCardDescription>
                 </TechCardHeader>
                 <TechCardContent className="space-y-4">
@@ -333,7 +333,7 @@ function WhatsAppPage() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone-number">Número do Telefone</Label>
+                      <Label htmlFor="phone-number">Numero do Telefone</Label>
                       <TechInput 
                         id="phone-number"
                         placeholder="+55 11 99999-9999"
@@ -379,7 +379,7 @@ function WhatsAppPage() {
             {connectionStatus.status === 'connected' && (
               <TechCard>
                 <TechCardHeader>
-                  <TechCardTitle>Status da Conexão</TechCardTitle>
+                  <TechCardTitle>Status da Conexao</TechCardTitle>
                 </TechCardHeader>
                 <TechCardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -393,7 +393,7 @@ function WhatsAppPage() {
                     
                     <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <Smartphone className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                      <p className="font-medium text-blue-700 dark:text-blue-300">Número</p>
+                      <p className="font-medium text-blue-700 dark:text-blue-300">Numero</p>
                       <p className="text-sm text-blue-600 dark:text-blue-400">
                         {connectionStatus.phoneNumber}
                       </p>
@@ -401,7 +401,7 @@ function WhatsAppPage() {
                     
                     <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                       <Clock className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                      <p className="font-medium text-purple-700 dark:text-purple-300">Última Atividade</p>
+                      <p className="font-medium text-purple-700 dark:text-purple-300">Ultima Atividade</p>
                       <p className="text-sm text-purple-600 dark:text-purple-400">
                         {connectionStatus.lastActivity?.toLocaleTimeString()}
                       </p>
@@ -469,7 +469,7 @@ function WhatsAppPage() {
                       {!integration.configured && (
                         <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
                           <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                            ⚠️ Configuração necessária
+                            ⚠️ Configuracao necessaria
                           </p>
                         </div>
                       )}
@@ -484,15 +484,15 @@ function WhatsAppPage() {
           <TabsContent value="automations" className="space-y-6">
             <TechCard>
               <TechCardHeader>
-                <TechCardTitle>Automações e Agendamentos</TechCardTitle>
+                <TechCardTitle>Automacoes e Agendamentos</TechCardTitle>
                 <TechCardDescription>
-                  Configure respostas automáticas e agendamento de mensagens
+                  Configure respostas automaticas e agendamento de mensagens
                 </TechCardDescription>
               </TechCardHeader>
               <TechCardContent>
                 <div className="text-center py-12 text-muted-foreground">
                   <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Sistema de automações em desenvolvimento</p>
+                  <p>Sistema de automacoes em desenvolvimento</p>
                   <p className="text-sm">Em breve: triggers, agendamentos e fluxos automatizados</p>
                 </div>
               </TechCardContent>
@@ -503,16 +503,16 @@ function WhatsAppPage() {
           <TabsContent value="analytics" className="space-y-6">
             <TechCard>
               <TechCardHeader>
-                <TechCardTitle>Analytics e Relatórios</TechCardTitle>
+                <TechCardTitle>Analytics e Relatorios</TechCardTitle>
                 <TechCardDescription>
-                  Métricas de conversas e análise de desempenho
+                  Metricas de conversas e analise de desempenho
                 </TechCardDescription>
               </TechCardHeader>
               <TechCardContent>
                 <div className="text-center py-12 text-muted-foreground">
                   <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Dashboard de analytics em desenvolvimento</p>
-                  <p className="text-sm">Em breve: métricas detalhadas e relatórios personalizados</p>
+                  <p className="text-sm">Em breve: metricas detalhadas e relatorios personalizados</p>
                 </div>
               </TechCardContent>
             </TechCard>

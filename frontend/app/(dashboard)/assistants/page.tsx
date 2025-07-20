@@ -1,6 +1,6 @@
 /**
  * AIDA Assistentes - Assistants Page
- * Página de gerenciamento de assistentes de IA
+ * Pagina de gerenciamento de assistentes de IA
  * PATTERN: CRUD interface with real-time updates
  */
 
@@ -54,7 +54,7 @@ interface CreateAssistantData {
 
 const AI_MODELS = [
   { value: 'gpt-4', label: 'GPT-4 (Mais Inteligente)' },
-  { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (Mais Rápido)' },
+  { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (Mais Rapido)' },
   { value: 'claude-3-sonnet', label: 'Claude 3 Sonnet' },
   { value: 'claude-3-haiku', label: 'Claude 3 Haiku' }
 ];
@@ -120,7 +120,7 @@ function AssistantsPage() {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Nome do assistente é obrigatório');
+      toast.error('Nome do assistente e obrigatorio');
       return;
     }
 
@@ -163,7 +163,7 @@ function AssistantsPage() {
     e.preventDefault();
     
     if (!editingAssistant || !formData.name.trim()) {
-      toast.error('Nome do assistente é obrigatório');
+      toast.error('Nome do assistente e obrigatorio');
       return;
     }
 
@@ -202,7 +202,7 @@ function AssistantsPage() {
       
       if (response.success) {
         setAssistants(prev => prev.filter(a => a.id !== assistantId));
-        toast.success('Assistente excluído com sucesso!');
+        toast.success('Assistente excluido com sucesso!');
       }
     } catch (error: any) {
       console.error('Error deleting assistant:', error);
@@ -251,7 +251,7 @@ function AssistantsPage() {
                 {editingAssistant ? 'Editar Assistente' : 'Criar Novo Assistente'}
               </DialogTitle>
               <DialogDescription>
-                Configure as características e comportamento do seu assistente de IA
+                Configure as caracteristicas e comportamento do seu assistente de IA
               </DialogDescription>
             </DialogHeader>
             
@@ -270,7 +270,7 @@ function AssistantsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="whatsapp_number">Número WhatsApp</Label>
+                  <Label htmlFor="whatsapp_number">Numero WhatsApp</Label>
                   <Input
                     id="whatsapp_number"
                     value={formData.whatsapp_number}
@@ -282,15 +282,15 @@ function AssistantsPage() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
-                <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Breve descrição do assistente"
-                  disabled={isCreating}
-                />
-              </div>
+                  <Label htmlFor="description">Descricao</Label>
+                  <Input
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="Breve descricao do assistente"
+                    disabled={isCreating}
+                  />
+                </div>
               
               <div className="space-y-2">
                 <Label htmlFor="personality">Personalidade</Label>
@@ -298,23 +298,23 @@ function AssistantsPage() {
                   id="personality"
                   value={formData.personality}
                   onChange={(e) => handleInputChange('personality', e.target.value)}
-                  placeholder="Ex: Amigável, profissional, prestativo..."
+                  placeholder="Ex: Amigavel, profissional, prestativo..."
                   disabled={isCreating}
                   rows={3}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="instructions">Instruções</Label>
-                <Textarea
-                  id="instructions"
-                  value={formData.instructions}
-                  onChange={(e) => handleInputChange('instructions', e.target.value)}
-                  placeholder="Instruções específicas sobre como o assistente deve se comportar..."
-                  disabled={isCreating}
-                  rows={4}
-                />
-              </div>
+                  <Label htmlFor="instructions">Instrucoes</Label>
+                  <Textarea
+                    id="instructions"
+                    value={formData.instructions}
+                    onChange={(e) => handleInputChange('instructions', e.target.value)}
+                    placeholder="Instrucoes especificas sobre como o assistente deve se comportar..."
+                    disabled={isCreating}
+                    rows={4}
+                  />
+                </div>
               
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
@@ -338,7 +338,7 @@ function AssistantsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="temperature">Criatividade</Label>
+                  <Label htmlFor="temperature">Temperatura (Criatividade)</Label>
                   <Input
                     id="temperature"
                     type="number"
@@ -352,7 +352,7 @@ function AssistantsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="max_tokens">Máx. Tokens</Label>
+                  <Label htmlFor="max_tokens">Maximo de Tokens</Label>
                   <Input
                     id="max_tokens"
                     type="number"
@@ -378,10 +378,10 @@ function AssistantsPage() {
                   {isCreating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {editingAssistant ? 'Atualizando...' : 'Criando...'}
+                      {editingAssistant ? 'Atualizando assistente...' : 'Criando assistente...'}
                     </>
                   ) : (
-                    editingAssistant ? 'Atualizar' : 'Criar'
+                    editingAssistant ? 'Atualizar Assistente' : 'Criar Assistente'
                   )}
                 </Button>
               </div>
@@ -397,7 +397,7 @@ function AssistantsPage() {
             <Bot className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">Nenhum assistente criado</h3>
             <p className="text-muted-foreground text-center mb-4">
-              Crie seu primeiro assistente de IA para começar a automatizar seu atendimento no WhatsApp
+              Crie seu primeiro assistente de IA para comecar a automatizar seu atendimento no WhatsApp
             </p>
             <Button onClick={() => setShowCreateDialog(true)}>
               <Plus className="mr-2 h-4 w-4" />

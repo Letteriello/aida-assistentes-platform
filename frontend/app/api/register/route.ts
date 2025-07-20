@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false,
-          message: 'Dados inválidos',
+          message: 'Dados invalidos',
           errors: validation.errors 
         },
         { status: 400 }

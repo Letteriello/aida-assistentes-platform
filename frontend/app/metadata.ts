@@ -20,15 +20,15 @@ export const metadata: Metadata = {
     default: 'AIDA Platform - Assistentes Inteligentes de IA',
     template: '%s | AIDA Platform'
   },
-  description: 'Plataforma avançada de assistentes de IA para automação, produtividade e transformação digital. Crie, gerencie e implemente assistentes inteligentes personalizados.',
+  description: 'Plataforma avancada de assistentes de IA para automacao, produtividade e transformacao digital. Crie, gerencie e implemente assistentes inteligentes personalizados.',
   keywords: [
     'assistentes de IA',
-    'inteligência artificial',
-    'automação',
+    'inteligencia artificial',
+    'automacao',
     'produtividade',
     'chatbots',
     'IA empresarial',
-    'transformação digital',
+    'transformacao digital',
     'machine learning',
     'processamento de linguagem natural',
     'AIDA'
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     url: 'https://aida-platform.com',
     title: 'AIDA Platform - Assistentes Inteligentes de IA',
-    description: 'Plataforma avançada de assistentes de IA para automação e produtividade empresarial.',
+    description: 'Plataforma avancada de assistentes de IA para automacao e produtividade empresarial.',
     siteName: 'AIDA Platform',
     images: [
       {
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AIDA Platform - Assistentes Inteligentes de IA',
-    description: 'Plataforma avançada de assistentes de IA para automação e produtividade.',
+    description: 'Plataforma avancada de assistentes de IA para automacao e produtividade.',
     images: ['/twitter-image.png'],
     creator: '@aida_platform',
   },

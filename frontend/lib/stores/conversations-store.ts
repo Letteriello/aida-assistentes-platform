@@ -14,8 +14,8 @@ export interface Message {
     fileName?: string;
     fileSize?: number;
     mimeType?: string;
-    duration?: number; // para áudio
-    coordinates?: { lat: number; lng: number }; // para localização
+    duration?: number; // para audio
+    coordinates?: { lat: number; lng: number }; // para localizacao
   };
 }
 
@@ -34,7 +34,7 @@ export interface Conversation {
   createdAt: number;
   closedAt?: number;
   
-  // Estatísticas
+  // Estatisticas
   messageCount: number;
   responseTime: number;
   satisfaction?: number;

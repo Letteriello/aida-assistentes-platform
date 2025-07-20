@@ -59,7 +59,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
     stopPolling
   } = useInstancesStore();
 
-  // Conectar WebSocket e carregar instâncias
+  // Conectar WebSocket e carregar instancias
   useEffect(() => {
     const initializeConnections = async () => {
       // Conectar WebSocket
@@ -70,7 +70,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
         }
       }
       
-      // Carregar instâncias
+      // Carregar instancias
       loadInstances();
       startPolling(); // Manter polling como fallback
     };
@@ -79,7 +79,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
     
     return () => {
       stopPolling();
-      // WebSocket será desconectado quando o usuário sair da página
+      // WebSocket sera desconectado quando o usuario sair da pagina
     };
   }, [loadInstances, startPolling, stopPolling, token, webSocket]);
 
@@ -91,14 +91,14 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
     }
   }, [error, clearError]);
 
-  // Callback quando instância conecta
+  // Callback quando instancia conecta
   useEffect(() => {
     if (selectedInstance?.status === 'connected' && onInstanceConnected) {
       onInstanceConnected(selectedInstance.id);
     }
   }, [selectedInstance?.status, onInstanceConnected]);
 
-  // Entrar em sala da instância selecionada para receber updates
+  // Entrar em sala da instancia selecionada para receber updates
   useEffect(() => {
     if (selectedInstance && webSocket.isConnected()) {
       webSocket.joinInstance(selectedInstance.id);
@@ -111,7 +111,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
 
   const handleCreateInstance = async () => {
     if (!newInstanceName.trim()) {
-      toast.error('Nome da instância é obrigatório');
+      toast.error('Nome da instancia e obrigatorio');
       return;
     }
 
@@ -119,7 +119,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
     if (success) {
       setNewInstanceName('');
       setShowCreateForm(false);
-      toast.success('Instância criada com sucesso!');
+      toast.success('Instancia criada com sucesso!');
     }
   };
 
@@ -136,10 +136,10 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
   };
 
   const handleDeleteInstance = async (instanceId: string) => {
-    if (confirm('Tem certeza que deseja deletar esta instância?')) {
+    if (confirm('Tem certeza que deseja deletar esta instancia?')) {
       const success = await deleteInstance(instanceId);
       if (success) {
-        toast.success('Instância deletada com sucesso');
+        toast.success('Instancia deletada com sucesso');
         if (showQRCode === instanceId) {
           setShowQRCode(null);
           clearQRCode();
@@ -150,7 +150,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
 
   const handleSendTestMessage = async () => {
     if (!selectedInstance || !testPhone || !testMessage) {
-      toast.error('Selecione uma instância e preencha todos os campos');
+      toast.error('Selecione uma instancia e preencha todos os campos');
       return;
     }
 
@@ -203,19 +203,19 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header com botão de criar */}
+      {/* Header com botao de criar */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Minhas Instâncias WhatsApp</h2>
+        <h2 className="text-2xl font-bold">Minhas Instancias WhatsApp</h2>
         <Button 
           onClick={() => setShowCreateForm(true)}
           className="flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Nova Instância
+          Nova Instancia
         </Button>
       </div>
 
-      {/* Formulário de criação */}
+      {/* Formulario de criacao */}
       <AnimatePresence>
         {showCreateForm && (
           <motion.div
@@ -225,11 +225,11 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Criar Nova Instância</CardTitle>
+                <CardTitle>Criar Nova Instancia</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="instanceName">Nome da Instância</Label>
+                  <Label htmlFor="instanceName">Nome da Instancia</Label>
                   <Input
                     id="instanceName"
                     placeholder="Ex: MinhaEmpresa_WhatsApp"
@@ -259,7 +259,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
         )}
       </AnimatePresence>
 
-      {/* Lista de instâncias */}
+      {/* Lista de instancias */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {instances.map((instance) => (
           <Card 
@@ -338,13 +338,13 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
         <Card>
           <CardContent className="text-center py-8">
             <Smartphone className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhuma instância encontrada</h3>
+            <h3 className="text-lg font-semibold mb-2">Nenhuma instancia encontrada</h3>
             <p className="text-gray-600 mb-4">
-              Crie sua primeira instância WhatsApp para começar a usar o AIDA
+              Crie sua primeira instancia WhatsApp para comecar a usar o AIDA
             </p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Criar Primeira Instância
+              Criar Primeira Instancia
             </Button>
           </CardContent>
         </Card>
@@ -388,7 +388,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
                     />
                   </div>
                   <p className="text-sm text-gray-600 mt-4">
-                    Abra o WhatsApp no seu celular e escaneie este código
+                    Abra o WhatsApp no seu celular e escaneie este codigo
                   </p>
                 </div>
               ) : (
@@ -431,7 +431,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="testPhone">Número de Teste</Label>
+                <Label htmlFor="testPhone">Numero de Teste</Label>
                 <Input
                   id="testPhone"
                   placeholder="+5511999999999"
@@ -443,7 +443,7 @@ export function InstanceManager({ onInstanceConnected }: InstanceManagerProps) {
                 <Label htmlFor="testMessage">Mensagem</Label>
                 <Input
                   id="testMessage"
-                  placeholder="Olá! Esta é uma mensagem de teste."
+                  placeholder="Ola! Esta e uma mensagem de teste."
                   value={testMessage}
                   onChange={(e) => setTestMessage(e.target.value)}
                 />

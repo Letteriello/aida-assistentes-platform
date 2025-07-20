@@ -18,27 +18,8 @@ const nextConfig = {
       crypto: false,
     };
     
-    // Fix chunk loading issues in development
-    if (dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\\\/]node_modules[\\\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
-            reuseExistingChunk: true,
-          },
-        },
-      };
-    }
+    // Let Next.js handle chunk splitting automatically in development
+    // Custom splitChunks configuration can cause ChunkLoadError issues
     
     // Ensure proper module resolution
     config.resolve.alias = {

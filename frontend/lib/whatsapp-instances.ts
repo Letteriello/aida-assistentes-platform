@@ -66,7 +66,7 @@ export interface SendMessageResponse {
 
 class WhatsAppInstanceClient {
   /**
-   * Criar nova instância WhatsApp
+   * Criar nova instancia WhatsApp
    */
   async createInstance(request: CreateInstanceRequest): Promise<CreateInstanceResponse> {
     try {
@@ -82,7 +82,7 @@ class WhatsAppInstanceClient {
   }
 
   /**
-   * Listar instâncias do usuário
+   * Listar instancias do usuario
    */
   async listInstances(options: {
     includeDeleted?: boolean;
@@ -110,7 +110,7 @@ class WhatsAppInstanceClient {
   }
 
   /**
-   * Obter status de uma instância
+   * Obter status de uma instancia
    */
   async getInstanceStatus(instanceId: string): Promise<InstanceStatusResponse> {
     try {
@@ -119,13 +119,13 @@ class WhatsAppInstanceClient {
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Erro ao obter status da instância'
+        message: error.response?.data?.message || 'Erro ao obter status da instancia'
       };
     }
   }
 
   /**
-   * Obter QR Code para conectar instância
+   * Obter QR Code para conectar instancia
    */
   async getQRCode(instanceId: string): Promise<QRCodeResponse> {
     try {
@@ -140,7 +140,7 @@ class WhatsAppInstanceClient {
   }
 
   /**
-   * Deletar instância
+   * Deletar instancia
    */
   async deleteInstance(instanceId: string): Promise<{ success: boolean; message: string }> {
     try {
@@ -149,7 +149,7 @@ class WhatsAppInstanceClient {
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Erro ao deletar instância'
+        message: error.response?.data?.message || 'Erro ao deletar instancia'
       };
     }
   }
@@ -173,28 +173,28 @@ class WhatsAppInstanceClient {
   }
 
   /**
-   * Verificar se instância está conectada
+   * Verificar se instancia esta conectada
    */
   isInstanceConnected(instance: WhatsAppInstance): boolean {
     return instance.status === 'connected';
   }
 
   /**
-   * Verificar se instância precisa de QR Code
+   * Verificar se instancia precisa de QR Code
    */
   needsQRCode(instance: WhatsAppInstance): boolean {
     return instance.status === 'qrcode' || instance.status === 'creating';
   }
 
   /**
-   * Verificar se instância está disponível para uso
+   * Verificar se instancia esta disponivel para uso
    */
   isInstanceReady(instance: WhatsAppInstance): boolean {
     return instance.status === 'connected';
   }
 
   /**
-   * Obter texto de status amigável
+   * Obter texto de status amigavel
    */
   getStatusText(status: WhatsAppInstance['status']): string {
     const statusMap = {
@@ -237,7 +237,7 @@ class WhatsAppInstanceClient {
   }
 
   /**
-   * Gerar nome único para instância
+   * Gerar nome unico para instancia
    */
   generateInstanceName(baseName?: string): string {
     const base = baseName || 'MinhaInstancia';
@@ -248,11 +248,11 @@ class WhatsAppInstanceClient {
   }
 
   /**
-   * Validar nome da instância
+   * Validar nome da instancia
    */
   validateInstanceName(name: string): { isValid: boolean; error?: string } {
     if (!name || name.trim().length === 0) {
-      return { isValid: false, error: 'Nome é obrigatório' };
+      return { isValid: false, error: 'Nome e obrigatorio' };
     }
 
     if (name.length < 3) {
@@ -260,13 +260,13 @@ class WhatsAppInstanceClient {
     }
 
     if (name.length > 50) {
-      return { isValid: false, error: 'Nome deve ter no máximo 50 caracteres' };
+      return { isValid: false, error: 'Nome deve ter no maximo 50 caracteres' };
     }
 
     // Apenas letras, números, underscore e hífen
     const validPattern = /^[a-zA-Z0-9_-]+$/;
     if (!validPattern.test(name)) {
-      return { isValid: false, error: 'Nome deve conter apenas letras, números, _ e -' };
+      return { isValid: false, error: 'Nome deve conter apenas letras, numeros, _ e -' };
     }
 
     return { isValid: true };

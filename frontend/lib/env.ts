@@ -64,7 +64,7 @@ function validateEnv() {
 const envValidation = validateEnv();
 
 if (!envValidation.success) {
-  console.error('❌ Environment validation failed:');
+  console.error('Environment validation failed:');
   envValidation.errors?.forEach(error => {
     console.error(`  - ${error.field}: ${error.message}`);
   });

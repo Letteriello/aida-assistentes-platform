@@ -57,9 +57,9 @@ export default function SettingsPage() {
     try {
       // Simular salvamento
       await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Preferências de notificação atualizadas!');
+      toast.success('Preferencias de notificacao atualizadas!');
     } catch (error) {
-      toast.error('Erro ao atualizar notificações');
+      toast.error('Erro ao atualizar notificacoes');
     } finally {
       setLoading(false);
     }
@@ -69,9 +69,9 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Configuracoes</h1>
         <p className="text-muted-foreground">
-          Gerencie suas preferências e configurações da conta
+          Gerencie suas preferencias e configuracoes da conta
         </p>
       </div>
 
@@ -87,11 +87,11 @@ export default function SettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="notifications" className="flex items-center gap-2">
             <Bell className="h-4 w-4" />
-            Notificações
+            Notificacoes
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Segurança
+            Seguranca
           </TabsTrigger>
         </TabsList>
 
@@ -101,10 +101,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Informações Pessoais
+                Informacoes Pessoais
               </CardTitle>
               <CardDescription>
-                Atualize suas informações pessoais e de contato
+                Atualize suas informacoes pessoais e de contato
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -131,7 +131,7 @@ export default function SettingsPage() {
               <div className="flex justify-end">
                 <Button onClick={handleSaveProfile} disabled={loading}>
                   <Save className="mr-2 h-4 w-4" />
-                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                  {loading ? 'Salvando...' : 'Salvar Alteracoes'}
                 </Button>
               </div>
             </CardContent>
@@ -144,10 +144,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
-                Informações da Empresa
+                Informacoes da Empresa
               </CardTitle>
               <CardDescription>
-                Gerencie as informações da sua empresa
+                Gerencie as informacoes da sua empresa
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -165,7 +165,7 @@ export default function SettingsPage() {
                   <Input 
                     id="industry" 
                     defaultValue={business?.industry || ''} 
-                    placeholder="Setor de atuação"
+                    placeholder="Setor de atuacao"
                   />
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                     Professional
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    Renovação em 30 dias
+                    Renovacao em 30 dias
                   </span>
                 </div>
               </div>
@@ -199,19 +199,19 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Preferências de Notificação
+                Preferencias de Notificacao
               </CardTitle>
               <CardDescription>
-                Configure como você deseja receber notificações
+                Configure como voce deseja receber notificacoes
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label>Notificações por Email</Label>
+                    <Label>Notificacoes por Email</Label>
                     <p className="text-sm text-muted-foreground">
-                      Receba atualizações importantes por email
+                      Receba atualizacoes importantes por email
                     </p>
                   </div>
                   <Switch 
@@ -226,9 +226,9 @@ export default function SettingsPage() {
                 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label>Notificações Push</Label>
+                    <Label>Notificacoes Push</Label>
                     <p className="text-sm text-muted-foreground">
-                      Receba notificações no navegador
+                      Receba notificacoes no navegador
                     </p>
                   </div>
                   <Switch 
@@ -243,9 +243,9 @@ export default function SettingsPage() {
                 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label>Notificações SMS</Label>
+                    <Label>Notificacoes SMS</Label>
                     <p className="text-sm text-muted-foreground">
-                      Receba alertas críticos por SMS
+                      Receba alertas criticos por SMS
                     </p>
                   </div>
                   <Switch 
@@ -260,7 +260,7 @@ export default function SettingsPage() {
               <div className="flex justify-end">
                 <Button onClick={handleSaveNotifications} disabled={loading}>
                   <Save className="mr-2 h-4 w-4" />
-                  {loading ? 'Salvando...' : 'Salvar Preferências'}
+                  {loading ? 'Salvando...' : 'Salvar Preferencias'}
                 </Button>
               </div>
             </CardContent>
@@ -273,10 +273,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Segurança da Conta
+                Seguranca da Conta
               </CardTitle>
               <CardDescription>
-                Gerencie a segurança e acesso da sua conta
+                Gerencie a seguranca e acesso da sua conta
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-amber-600">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>Regenerar a chave API invalidará a chave atual</span>
+                  <span>Regenerar a chave API invalidara a chave atual</span>
                 </div>
               </div>
               

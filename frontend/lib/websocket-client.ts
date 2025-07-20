@@ -73,7 +73,7 @@ class WebSocketClient {
       this.setupEventHandlers();
 
       this.socket.on('connect', () => {
-        console.log('✅ WebSocket connected');
+        console.log('WebSocket connected');
         this.isConnecting = false;
         this.reconnectAttempts = 0;
         
@@ -87,14 +87,14 @@ class WebSocketClient {
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('❌ WebSocket connection error:', error);
+        console.error('WebSocket connection error:', error);
         this.isConnecting = false;
         this.handleReconnect();
         resolve(false);
       });
 
       this.socket.on('disconnect', (reason) => {
-        console.log('🔌 WebSocket disconnected:', reason);
+        console.log('WebSocket disconnected:', reason);
         this.isConnecting = false;
         
         if (reason === 'io server disconnect') {
@@ -114,16 +114,16 @@ class WebSocketClient {
     // Authentication response
     this.socket.on('authenticated', (data) => {
       if (data.success) {
-        console.log('✅ WebSocket authenticated for user:', data.userId);
+        console.log('WebSocket authenticated for user:', data.userId);
       } else {
-        console.error('❌ WebSocket authentication failed:', data.error);
-        toast.error('Erro na autenticação WebSocket');
+        console.error('WebSocket authentication failed:', data.error);
+        toast.error('Erro na autenticacao WebSocket');
       }
     });
 
     // Instance updates
     this.socket.on('instance-update', (update: InstanceUpdate) => {
-      console.log('📱 Instance update received:', update);
+      console.log('Instance update received:', update);
       
       const instancesStore = useInstancesStore.getState();
       
@@ -158,7 +158,7 @@ class WebSocketClient {
 
     // QR Code updates
     this.socket.on('qr-code-update', (update: QRCodeUpdate) => {
-      console.log('🔄 QR Code update received:', update.instanceId);
+      console.log('QR Code update received:', update.instanceId);
       
       const instancesStore = useInstancesStore.getState();
       instancesStore.currentQRCode = update.qrCode;
@@ -168,7 +168,7 @@ class WebSocketClient {
 
     // New messages
     this.socket.on('new-message', (message: NewMessage) => {
-      console.log('💬 New message received:', message);
+      console.log('New message received:', message);
       
       // You can handle new message notifications here
       toast.info(`Nova mensagem de ${message.sender}`);
@@ -176,7 +176,7 @@ class WebSocketClient {
 
     // System notifications
     this.socket.on('system-notification', (notification: SystemNotification) => {
-      console.log('📢 System notification:', notification);
+      console.log('System notification:', notification);
       
       switch (notification.type) {
         case 'info':
@@ -207,7 +207,7 @@ class WebSocketClient {
   }
 
   /**
-   * Entrar em sala de instância
+   * Entrar em sala de instancia
    */
   joinInstance(instanceId: string) {
     if (this.socket?.connected) {
@@ -216,7 +216,7 @@ class WebSocketClient {
   }
 
   /**
-   * Sair de sala de instância
+   * Sair de sala de instancia
    */
   leaveInstance(instanceId: string) {
     if (this.socket?.connected) {
@@ -225,7 +225,7 @@ class WebSocketClient {
   }
 
   /**
-   * Verificar saúde da conexão
+   * Verificar saude da conexao
    */
   ping() {
     if (this.socket?.connected) {
@@ -244,26 +244,26 @@ class WebSocketClient {
   }
 
   /**
-   * Verificar se está conectado
+   * Verificar se esta conectado
    */
   isConnected(): boolean {
     return this.socket?.connected || false;
   }
 
   /**
-   * Tratar reconexão
+   * Tratar reconexao
    */
   private handleReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('❌ Max reconnection attempts reached');
-      toast.error('Conexão WebSocket perdida. Recarregue a página.');
+      console.error('Max reconnection attempts reached');
+      toast.error('Conexao WebSocket perdida. Recarregue a pagina.');
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
     
-    console.log(`🔄 Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
     
     setTimeout(() => {
       this.connect();
@@ -271,7 +271,7 @@ class WebSocketClient {
   }
 
   /**
-   * Obter status da conexão
+   * Obter status da conexao
    */
   getConnectionStatus() {
     return {

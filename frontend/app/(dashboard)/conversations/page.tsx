@@ -1,6 +1,6 @@
 /**
  * AIDA Assistentes - Conversations Page
- * Página de gerenciamento de conversas dos assistentes
+ * Pagina de gerenciamento de conversas dos assistentes
  * PATTERN: Real-time chat interface with filtering
  */
 
@@ -163,7 +163,7 @@ function ConversationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Conversas</h1>
+          <h1 className="text-3xl font-bold">Conversacoes</h1>
           <p className="text-muted-foreground">
             Acompanhe todas as conversas dos seus assistentes de IA
           </p>
@@ -228,7 +228,7 @@ function ConversationsPage() {
             <h3 className="text-lg font-semibold mb-2">Nenhuma conversa encontrada</h3>
             <p className="text-muted-foreground text-center">
               {conversations.length === 0 
-                ? 'Suas conversas aparecerão aqui quando os clientes começarem a interagir com seus assistentes'
+                ? 'Suas conversas aparecerao aqui quando os clientes comecarao a interagir com seus assistentes'
                 : 'Tente ajustar os filtros para encontrar as conversas que procura'
               }
             </p>

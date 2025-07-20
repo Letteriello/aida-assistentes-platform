@@ -10,9 +10,9 @@ const techCardVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-card text-card-foreground shadow-sm border-border",
+          "bg-card text-card-foreground shadow-sm border-border dark:bg-tech-dark-800 dark:text-tech-dark-100 dark:border-tech-dark-700",
         glass:
-          "backdrop-blur-md bg-card/95 text-card-foreground shadow-lg border-border/50",
+          "backdrop-blur-md bg-card/95 text-card-foreground shadow-lg border-border/50 dark:bg-tech-dark-900/95 dark:text-tech-dark-100 dark:border-tech-dark-700/50",
         tech:
           "bg-gradient-to-br from-tech-dark-50 to-tech-blue-50 dark:from-tech-dark-900 dark:to-tech-dark-800 text-tech-dark-800 dark:text-tech-dark-100 shadow-md border-tech-blue-200 dark:border-tech-dark-700",
         outline:

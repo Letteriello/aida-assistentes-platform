@@ -46,7 +46,7 @@ export default function DashboardPage() {
             Bem-vindo ao AIDA Dashboard
           </h1>
           <p className="text-gray-600">
-            Olá, {user?.name || 'Usuário'}! Gerencie seus assistentes de IA e instâncias WhatsApp.
+            Ola, {user?.name || 'Usuario'}! Gerencie seus assistentes de IA e instancias WhatsApp.
           </p>
         </div>
 
@@ -63,14 +63,14 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 text-sm mb-4">
-                Conecte e gerencie suas instâncias WhatsApp Business para começar a atender clientes.
+                Conecte e gerencie suas instancias WhatsApp Business para comecar a atender clientes.
               </p>
               <Button 
                 onClick={() => router.push('/dashboard/whatsapp')}
                 className="w-full"
                 variant="outline"
               >
-                Gerenciar Instâncias
+                Gerenciar Instancias
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
@@ -107,7 +107,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 text-sm mb-4">
-                Acompanhe métricas de desempenho, satisfação e estatísticas de uso.
+                Acompanhe metricas de desempenho, satisfacao e estatisticas de uso.
               </p>
               <Button className="w-full" variant="outline" disabled>
                 Em Breve
@@ -134,7 +134,7 @@ export default function DashboardPage() {
                 <div>
                   <h4 className="font-medium text-gray-900">Conecte seu WhatsApp Business</h4>
                   <p className="text-gray-600 text-sm">
-                    Crie uma instância WhatsApp e conecte usando o QR Code. Isso permitirá que você receba e envie mensagens.
+                    Crie uma instancia WhatsApp e conecte usando o QR Code. Isso permitira que voce receba e envie mensagens.
                   </p>
                   <Button 
                     onClick={() => router.push('/dashboard/whatsapp')}
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                 <div>
                   <h4 className="font-medium text-gray-900">Comece a Atender Clientes</h4>
                   <p className="text-gray-600 text-sm">
-                    Seu assistente estará pronto para responder mensagens automaticamente no WhatsApp.
+                    Seu assistente estara pronto para responder mensagens automaticamente no WhatsApp.
                   </p>
                 </div>
               </div>

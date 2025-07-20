@@ -56,7 +56,7 @@ export default function DashboardPage() {
       change: '+8.2%',
       changeType: 'positive' as const,
       icon: MessageSquare,
-      description: 'Pico: 156/hora às 14h'
+      description: 'Pico: 156/hora as 14h'
     },
     {
       title: 'Tempo de Resposta',
@@ -108,7 +108,7 @@ export default function DashboardPage() {
       lastActive: '1 hora atrás'
     },
     {
-      name: 'Suporte Técnico',
+      name: 'Suporte Tecnico',
       status: 'active' as const,
       conversations: 156,
       accuracy: 94,
@@ -222,7 +222,7 @@ export default function DashboardPage() {
 
       {/* Métricas Overview */}
       <section>
-        <h2 className="text-xl font-semibold mb-4">Visão Geral do Sistema</h2>
+        <h2 className="text-xl font-semibold mb-4">Visao Geral do Sistema</h2>
         <StaggerChildren className="bento-grid bento-grid-lg" staggerDelay={0.1}>
           {metrics.map((metric, index) => (
             <StaggerItem key={metric.title}>
@@ -324,15 +324,15 @@ export default function DashboardPage() {
                   Feed de Atividade do Sistema
                 </CardTitle>
                 <CardDescription>
-                  Atualizações em tempo real dos seus assistentes de IA
+                  Atualizacoes em tempo real dos seus assistentes de IA
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {[
                     { action: 'Nova conversa iniciada', assistant: 'Suporte ao Cliente', time: '2 min atrás', type: 'info' },
-                    { action: 'Treinamento concluído com sucesso', assistant: 'Assistente de Vendas', time: '15 min atrás', type: 'success' },
-                    { action: 'Alto tempo de resposta detectado', assistant: 'Suporte Técnico', time: '1 hora atrás', type: 'warning' },
+                    { action: 'Treinamento concluido com sucesso', assistant: 'Assistente de Vendas', time: '15 min atrás', type: 'success' },
+                    { action: 'Alto tempo de resposta detectado', assistant: 'Suporte Tecnico', time: '1 hora atrás', type: 'warning' },
                     { action: 'Assistente implantado em produção', assistant: 'Guia de Produtos', time: '2 horas atrás', type: 'success' }
                   ].map((activity, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
@@ -358,7 +358,7 @@ export default function DashboardPage() {
             <Card className="bento-card">
               <CardHeader>
                 <CardTitle>Conversas Recentes</CardTitle>
-                <CardDescription>Últimas interações com usuários</CardDescription>
+                <CardDescription>Ultimas interacoes com usuarios</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8 text-muted-foreground">
@@ -373,7 +373,7 @@ export default function DashboardPage() {
             <Card className="bento-card">
               <CardHeader>
                 <CardTitle>Analytics Detalhados</CardTitle>
-                <CardDescription>Insights e métricas avançadas</CardDescription>
+                <CardDescription>Insights e metricas avancadas</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8 text-muted-foreground">
