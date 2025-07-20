@@ -1,5 +1,6 @@
 # AIDA Platform - Backend
 
+<<<<<<< HEAD
 > **🚀 Intelligent WhatsApp Assistant Platform powered by Cloudflare Workers**
 
 A complete backend solution for managing AI-powered WhatsApp assistants with advanced RAG capabilities, multi-tenancy, and real-time processing.
@@ -56,10 +57,40 @@ graph TB
 - **JWT Authentication**: Secure API access
 - **Rate Limiting**: DDoS protection and fair usage
 - **Edge Computing**: Global low-latency deployment
+=======
+## 🚀 Overview
+
+The AIDA Platform backend is a robust, scalable system built for managing AI-powered WhatsApp assistants. It provides a comprehensive API for authentication, assistant management, conversation handling, and advanced RAG (Retrieval Augmented Generation) capabilities.
+
+## ✨ Features
+
+- **🔐 WhatsApp Authentication**: Secure phone-based authentication system
+- **🤖 Assistant Management**: Create and configure AI assistants with custom personalities
+- **💬 Conversation Handling**: Real-time message processing with Evolution API integration
+- **🧠 Hybrid RAG System**: Combines vector search and knowledge graphs for intelligent responses
+- **📊 Analytics**: Comprehensive usage tracking and performance metrics
+- **🔒 Multi-tenant Security**: Complete data isolation between organizations
+- **⚡ High Performance**: Optimized for low latency and high concurrency
+
+## 🏗️ Architecture
+
+### Core Services
+- **Authentication Service**: WhatsApp-based user verification
+- **Assistant Service**: AI assistant configuration and management
+- **Conversation Service**: Message processing and response generation
+- **RAG Engine**: Hybrid search combining vectors and knowledge graphs
+- **Evolution API Integration**: WhatsApp Business API management
+
+### Data Layer
+- **Supabase PostgreSQL**: Primary database with vector extensions
+- **Neo4j**: Knowledge graph for complex relationship queries
+- **Redis**: Caching and session management
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+<<<<<<< HEAD
 
 - **Node.js** 18+ and npm
 - **Cloudflare Account** with Workers plan
@@ -129,6 +160,35 @@ npm run deploy:secrets
 
 # Deploy to Cloudflare Workers
 npm run deploy
+=======
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- Evolution API instance
+- OpenAI API key
+
+### Installation
+
+1. **Clone and install dependencies**
+```bash
+cd backend
+npm install
+```
+
+2. **Configure environment**
+```bash
+cp .env.example .env.local
+# Edit .env.local with your actual values
+```
+
+3. **Start development server**
+```bash
+# For MVP Express server
+npm run dev:mvp
+
+# For Cloudflare Workers (production)
+npm run dev
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 ## 📁 Project Structure
@@ -136,6 +196,7 @@ npm run deploy
 ```
 backend/
 ├── src/
+<<<<<<< HEAD
 │   ├── ai/                    # AI and LangChain integration
 │   │   ├── langchain-setup.ts  # LangChain configuration
 │   │   └── response-generator.ts # AI response generation
@@ -166,6 +227,29 @@ backend/
 ├── wrangler.toml             # Cloudflare Workers config
 ├── package.json              # Dependencies and scripts
 └── README.md                 # This file
+=======
+│   ├── api/                   # API route handlers
+│   │   ├── auth.ts           # Authentication endpoints
+│   │   ├── assistants.ts     # Assistant management
+│   │   ├── conversations.ts  # Conversation handling
+│   │   └── webhooks.ts       # Webhook endpoints
+│   ├── services/             # Business logic
+│   │   ├── auth/             # Authentication services
+│   │   ├── assistants/       # Assistant management
+│   │   ├── conversations/    # Message processing
+│   │   ├── rag/              # RAG engine
+│   │   └── evolution-api/    # WhatsApp integration
+│   ├── database/             # Database utilities
+│   │   ├── supabase.ts       # Supabase client
+│   │   ├── neo4j.ts          # Neo4j driver
+│   │   └── migrations/       # Database migrations
+│   ├── types/                # TypeScript definitions
+│   └── utils/                # Utility functions
+├── tests/                    # Test suites
+├── scripts/                  # Development scripts
+├── wrangler.toml            # Cloudflare Workers config
+└── package.json             # Dependencies and scripts
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 ## 🔧 Development
@@ -174,6 +258,7 @@ backend/
 
 ```bash
 # Development
+<<<<<<< HEAD
 npm run dev              # Start development server
 npm run build            # Build for production
 npm run deploy           # Deploy to Cloudflare Workers
@@ -196,10 +281,26 @@ npm run test:security    # Security tests
 npm run lint             # Code linting
 npm run format           # Code formatting
 npm run type-check       # TypeScript checking
+=======
+npm run dev:mvp          # Start MVP Express server
+npm run dev              # Start Cloudflare Workers dev
+npm run build            # Build for production
+
+# Testing
+npm run test             # Run all tests
+npm run test:watch       # Watch mode
+npm run test:coverage    # Coverage report
+
+# Code Quality
+npm run lint             # ESLint
+npm run format           # Prettier
+npm run type-check       # TypeScript check
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 ### Environment Variables
 
+<<<<<<< HEAD
 See `.env.example` for all available configuration options:
 
 - **Database**: Supabase connection and credentials
@@ -236,10 +337,46 @@ npm run test:coverage
 
 # Run tests in watch mode
 npm run test:watch
+=======
+See `.env.example` for all required environment variables. Key configurations:
+
+- **Supabase**: Database and authentication
+- **Evolution API**: WhatsApp integration
+- **OpenAI**: AI model access
+- **Neo4j**: Knowledge graph database
+
+## 🧪 Testing
+
+### Test Structure
+```bash
+tests/
+├── unit/                # Unit tests
+├── integration/         # Integration tests
+├── e2e/                # End-to-end tests
+└── fixtures/           # Test data
+```
+
+### Running Tests
+```bash
+# All tests
+npm run test:all
+
+# Specific test suites
+npm run test:auth
+npm run test:assistants
+npm run test:conversations
+
+# Load testing
+npm run test:load
+
+# Security testing
+npm run test:security
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 ## 🚀 Deployment
 
+<<<<<<< HEAD
 ### Cloudflare Workers Setup
 
 1. **Install Wrangler CLI**:
@@ -279,20 +416,48 @@ npm run test:watch
    npm run deploy
    ```
 
+=======
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ### Production Checklist
 
 - [ ] Environment variables configured
 - [ ] Database migrations applied
 - [ ] Cloudflare resources created
+<<<<<<< HEAD
 - [ ] Secrets properly set
 - [ ] Custom domain configured
 - [ ] SSL certificates active
 - [ ] Monitoring and alerts setup
 - [ ] Backup strategy implemented
+=======
+- [ ] Evolution API configured
+- [ ] Monitoring setup
+
+### Cloudflare Workers Deployment
+
+```bash
+# Deploy to staging
+npm run deploy:staging
+
+# Deploy to production
+npm run deploy:production
+```
+
+### MVP Express Server Deployment
+
+```bash
+# Build for production
+npm run build:mvp
+
+# Start production server
+npm run start:mvp
+```
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 
 ## 📊 Monitoring
 
 ### Health Checks
+<<<<<<< HEAD
 
 - **Endpoint**: `GET /health`
 - **Components**: Database, AI services, Evolution API
@@ -312,10 +477,28 @@ wrangler tail
 
 # View specific log levels
 wrangler tail --format=pretty --level=error
+=======
+```bash
+# Check service health
+curl http://localhost:8787/health
+
+# MVP server health
+curl http://localhost:3000/health
+```
+
+### Logging
+```bash
+# View logs (Cloudflare)
+npm run logs
+
+# Production logs
+npm run logs:production
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 ## 🔒 Security
 
+<<<<<<< HEAD
 ### Authentication Flow
 
 1. **Business Registration**: Admin creates business account
@@ -360,3 +543,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ using Cloudflare Workers, Supabase, and modern AI technologies.**
+=======
+- **Authentication**: JWT-based with WhatsApp verification
+- **Authorization**: Role-based access control
+- **Data Encryption**: End-to-end encryption for sensitive data
+- **Rate Limiting**: Configurable rate limits per endpoint
+- **Input Validation**: Zod schema validation
+- **CORS**: Configured for frontend domains only
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Run the test suite
+6. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 📞 Support
+
+For issues and questions:
+- Check the logs for error details
+- Review the test suite for examples
+- Open an issue on GitHub
+
+---
+
+**AIDA Platform Backend** - Powering intelligent WhatsApp assistants 🚀
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1

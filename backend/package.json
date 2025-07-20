@@ -126,4 +126,8 @@
     "vitest-environment-miniflare": "^2.14.4",
     "wrangler": "^4.23.0"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1

@@ -221,3 +221,274 @@ venv_linux
 __pycache__
 .ruff_cache
 .pytest_cache
+
+# =============================================================================
+# AIDA PLATFORM - COMPREHENSIVE GITIGNORE
+# =============================================================================
+# SECURITY: Protects sensitive information from being committed
+# PERFORMANCE: Excludes build artifacts and dependencies
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# =============================================================================
+# ENVIRONMENT VARIABLES & SECRETS (CRITICAL SECURITY)
+# =============================================================================
+# All environment files containing sensitive data
+.env
+.env.*
+.env.local
+.env.development
+.env.development.local
+.env.staging
+.env.staging.local
+.env.production
+.env.production.local
+.env.test
+.env.test.local
+
+# API Keys and Secrets
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+keys/
+api-keys.json
+config/secrets.json
+
+# Evolution API specific
+evolution-api-config.json
+whatsapp-instances.json
+
+# Supabase local config
+supabase/.env
+supabase/config.toml
+
+# Cloudflare Workers secrets
+.dev.vars
+wrangler.toml.local
+.wrangler/
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next/
+out/
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Cloudflare Workers
+.wrangler/
+wrangler.toml.backup
+
+# Test results
+test-results/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Build outputs
+build/
+dist/
+
+# Temporary files
+tmp/
+temp/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# =============================================================================
+# CLOUDFLARE WORKERS & DEPLOYMENT
+# =============================================================================
+# Cloudflare Workers
+.wrangler/
+wrangler.toml.backup
+
+# =============================================================================
+# DOCKER & CONTAINERS
+# =============================================================================
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# =============================================================================
+# AIDA PLATFORM SPECIFIC
+# =============================================================================
+# WhatsApp instances data
+whatsapp-sessions/
+instances/
+
+# Neo4j data
+neo4j-data/
+graph-data/
+
+# Vector embeddings cache
+embeddings-cache/
+vector-store/
+
+# AI model cache
+models-cache/
+
+# User uploads
+uploads/
+user-files/
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Performance monitoring
+performance-logs/
+metrics/
+
+# Development tools
+.trae/
+.cursor/
+.bolt/
+
+# Testing
+test-coverage/
+e2e-results/
+playwright-report/
+
+# Documentation builds
+docs/build/
+docs/.docusaurus/
+
+# Monitoring and analytics
+analytics-data/
+monitoring-logs/
+
+# Temporary development files
+*.tmp
+*.temp
+dev-notes.md
+todo.md
+
+# Package manager locks (keep only one)
+# npm
+# package-lock.json
+# yarn
+# yarn.lock
+# pnpm
+# pnpm-lock.yaml

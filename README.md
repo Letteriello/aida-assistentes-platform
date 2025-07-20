@@ -138,8 +138,13 @@ aida-platform/
 
 1. **Clone o repositório**
 ```bash
+<<<<<<< HEAD
 git clone https://github.com/your-org/aida-platform.git
 cd aida-platform
+=======
+git clone https://github.com/Letteriello/aida-assistentes-platform.git
+cd aida-assistentes-platform
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 2. **Instale as dependências**
@@ -202,32 +207,48 @@ docker-compose -f docker-compose.dev.yml up
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+<<<<<<< HEAD
 NEXT_PUBLIC_API_URL=http://localhost:3001
+=======
+NEXT_PUBLIC_API_URL=http://localhost:8787
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 ```
 
 #### Backend (.env)
 ```env
 # Database
+<<<<<<< HEAD
 DATABASE_URL=postgresql://user:password@localhost:5432/aida
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_KEY=your_supabase_service_key
+=======
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 
 # AI Services
 OPENAI_API_KEY=your_openai_key
 ANTHROPIC_API_KEY=your_anthropic_key
 
+<<<<<<< HEAD
 # WhatsApp
 WHATSAPP_TOKEN=your_whatsapp_token
 WHATSAPP_VERIFY_TOKEN=your_verify_token
 
 # Redis
 REDIS_URL=redis://localhost:6379
+=======
+# WhatsApp Integration
+EVOLUTION_API_URL=your_evolution_api_url
+EVOLUTION_API_KEY=your_evolution_api_key
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 
 # Security
 JWT_SECRET=your_jwt_secret
 ENCRYPTION_KEY=your_encryption_key
 ```
 
+<<<<<<< HEAD
 ## 📊 Monitoramento e Observabilidade
 
 ### Métricas Principais
@@ -306,10 +327,20 @@ npm run test:coverage
 - [**Integração WhatsApp**](docs/whatsapp-integration.md)
 - [**Deploy e CI/CD**](docs/deployment.md)
 - [**Troubleshooting**](docs/troubleshooting.md)
+=======
+## 📚 Documentação
+
+- [Guia de Instalação](docs/installation.md)
+- [API Reference](docs/api.md)
+- [Arquitetura](docs/architecture.md)
+- [Deploy](docs/deployment.md)
+- [Contribuição](docs/contributing.md)
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
 
 ## 🤝 Contribuição
 
 1. Fork o projeto
+<<<<<<< HEAD
 2. Crie uma branch para sua feature (`git checkout -b feature/amazing-feature`)
 3. Commit suas mudanças (`git commit -m 'Add amazing feature'`)
 4. Push para a branch (`git push origin feature/amazing-feature`)
@@ -357,3 +388,23 @@ Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICEN
 **Desenvolvido com ❤️ pela equipe AIDA**
 
 *Transformando conversas em experiências inteligentes*
+=======
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 📞 Suporte
+
+- 📧 Email: suporte@aida-platform.com
+- 💬 Discord: [AIDA Community](https://discord.gg/aida)
+- 📖 Documentação: [docs.aida-platform.com](https://docs.aida-platform.com)
+
+---
+
+**AIDA Platform** - Transformando atendimento com IA 🚀
+>>>>>>> 71f4edea800491fc84c14ab6e43a6a974d0180c1
